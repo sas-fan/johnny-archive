@@ -327,17 +327,62 @@ header {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
+.album-image-link {
+    display: block;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s;
+}
+
+.album-image-link:hover {
+    transform: translateY(-4px);
+}
+
+.album-cover {
+    width: 200px;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.amazon-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    color: var(--accent-orange);
+}
+
+.amazon-overlay i {
+    width: 40px;
+    height: 40px;
+}
+
+.album-image-link:hover .amazon-overlay {
+    opacity: 1;
+}
+
 .album-icon {
-    width: 80px;
-    height: 80px;
+    width: 200px;
+    height: 200px;
     background: linear-gradient(135deg, var(--accent-blue), var(--accent-orange));
-    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     color: #fff;
-    margin-bottom: 20px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
 }
 
 .album-title {

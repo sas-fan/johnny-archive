@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAS Song Archive & Database | サザンオールスターズ 楽曲データベース</title>
+    <meta name="description" content="サザンオールスターズ、桑田佳祐、および関連アーティストの膨大な楽曲情報を網羅したアーカイブデータベース。テーマ別フィルタリングや検索が可能です。">
+    <meta property="og:title" content="SAS Song Archive & Database">
+    <meta property="og:description" content="サザンオールスターズ＆関連アーティストの楽曲データベース">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <header>
+            <div class="logo-area">
+                <div class="logo">
+                    <i data-lucide="music"></i>
+                    SAS ARCHIVE
+                </div>
+                <div class="subtitle">サザンオールスターズ＆関連アーティスト 楽曲データベース</div>
+            </div>
+            <div class="search-container">
+                <input type="text" v-model="searchQuery" class="search-input" placeholder="曲名、アーティスト、歌詞で検索...">
+            </div>
+            <div class="stats" style="color: var(--text-secondary); font-size: 0.9rem;">
+                {{ filteredSongs.length }} Tracks
+            </div>
+        </header>
+
+        <main>
+            <div v-if="errorMsg" class="error-banner">
+                <i data-lucide="alert-triangle"></i> {{ errorMsg }}
+            </div>
+
+            <div class="controls">
+                <div class="filter-group">
+                    <span class="filter-label">Themes</span>
+                    <div class="tag" :class="{ active: selectedThemes.length === 0 }" @click="selectedThemes = []">All
+                    </div>
+                    <div v-for="theme in allThemes" :key="theme" class="tag"
+                        :class="{ active: selectedThemes.includes(theme) }" @click="toggleTheme(theme)">
+                        {{ theme }}
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Artist</span>
+                    <div class="tag" :class="{ active: selectedArtist === '' }" @click="selectedArtist = ''">All</div>
+                    <div v-for="artist in allArtists" :key="artist" class="tag"
+                        :class="{ active: selectedArtist === artist }" @click="selectedArtist = artist">
+                        {{ artist }}
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Sort</span>
+                    <div class="tag" :class="{ active: sortBy === 'year-desc' }" @click="sortBy = 'year-desc'">Newer
+                    </div>
+                    <div class="tag" :class="{ active: sortBy === 'year-asc' }" @click="sortBy = 'year-asc'">Older</div>
+                    <div class="tag" :class="{ active: sortBy === 'title' }" @click="sortBy = 'title'">A-Z</div>
+                </div>
+
+                <div class="filter-group">
+                    <button class="random-btn" @click="pickRandomSong">
+                        <i data-lucide="shuffle"></i> Random Pick
+                    </button>
+                </div>
+            </div>
+
+            <div class="song-grid">
+                <div v-for="song in slicedSongs" :key="song.id" class="song-card" @click="openSong(song)">
+                    <div class="year">{{ song.release_year }}</div>
+                    <div class="title">{{ song.title }}</div>
+                    <div class="artist">{{ song.artist }}</div>
+                    <div class="themes">
+                        <span v-for="theme in song.themes" :key="theme" class="theme-badge">{{ theme }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="filteredSongs.length > displayLimit" style="text-align: center; padding: 40px;">
+                <button class="tag" @click="displayLimit += 48" style="padding: 12px 40px; font-size: 1rem;">Load
+                    More</button>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <p>※ このサイトはサザンオールスターズのファンが個人的に制作したデータベースです。<br>
+                    楽曲・歌詞の著作権はサザンオールスターズ、桑田佳祐、および各権利者に帰属します。</p>
+                <div class="footer-bottom">
+                    &copy; 2026 SAS ARCHIVE PROJECT
+                </div>
+            </div>
+        </footer>
+
+        <!-- Song Modal -->
+        <transition name="fade">
+            <div v-if="currentSong" class="modal-overlay" @click.self="currentSong = null">
+                <div class="modal-content">
+                    <button class="modal-close" @click="currentSong = null"><i data-lucide="x"></i></button>
+
+                    <div style="text-align: center;">
+                        <div class="year" style="color: var(--accent-blue); font-weight: 700; margin-bottom: 8px;">{{
+                            currentSong.release_year }}</div>
+                        <h2 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 8px;">{{ currentSong.title }}
+                        </h2>
+                        <div style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 24px;">{{
+                            currentSong.artist }}</div>
+
+                        <div class="themes" style="justify-content: center; gap: 10px;">
+                            <span v-for="theme in currentSong.themes" :key="theme" class="tag active">{{ theme }}</span>
+                        </div>
+                    </div>
+
+                    <div class="external-links">
+                        <a :href="currentSong.links.lyrics" target="_blank" rel="noopener noreferrer"
+                            class="link-btn lyrics-link">
+                            <i data-lucide="music-4"></i> 歌詞を検索 (Uta-Net)
+                        </a>
+                        <a :href="currentSong.links.amazon" target="_blank" rel="noopener noreferrer"
+                            class="link-btn amazon-link">
+                            <i data-lucide="headphones"></i> Amazon Music
+                        </a>
+                        <a :href="currentSong.links.spotify" target="_blank" rel="noopener noreferrer"
+                            class="link-btn spotify-link">
+                            <i data-lucide="play-circle"></i> Spotify
+                        </a>
+                        <a :href="currentSong.links.apple" target="_blank" rel="noopener noreferrer"
+                            class="link-btn apple-link">
+                            <i data-lucide="music"></i> Apple Music
+                        </a>
+                        <a :href="currentSong.links.ytmusic" target="_blank" rel="noopener noreferrer"
+                            class="link-btn ytmusic-link">
+                            <i data-lucide="play"></i> YouTube Music
+                        </a>
+                        <a :href="currentSong.links.youtube" target="_blank" rel="noopener noreferrer"
+                            class="link-btn youtube-link">
+                            <i data-lucide="youtube"></i> YouTube 検索
+                        </a>
+                    </div>
+
+                    <div class="album-list">
+                        <h3 style="margin-bottom: 20px;">Included in</h3>
+                        <div v-for="album in currentSong.albums" class="album-item">
+                            <div>
+                                <span style="font-weight: 700;">{{ album.title }}</span>
+                                <span
+                                    style="font-size: 0.8rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; margin-left:8px;">{{
+                                    album.category }}</span>
+                            </div>
+                            <div style="color: var(--text-secondary);">{{ album.date }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted, watch } = Vue;
+
+        createApp({
+            setup() {
+                const songs = ref([]);
+                const searchQuery = ref('');
+                const selectedThemes = ref([]);
+                const selectedArtist = ref('');
+                const sortBy = ref('year-desc');
+                const displayLimit = ref(48);
+                const currentSong = ref(null);
+
+                const allThemes = ref([]);
+                const allArtists = ref([]);
+                const errorMsg = ref('');
+
+                onMounted(async () => {
+                    if (window.location.protocol === 'file:') {
+                        errorMsg.value = '【注意】ローカル環境(file://)ではブラウザのセキュリティ制限によりデータファイルを読み込めません。VSCodeのLive Serverなどのローカルサーバー経由でアクセスしてください。';
+                    }
+                    try {
+                        const response = await fetch('songs.json');
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        songs.value = await response.json();
+
+                        // Extract unique artists, exclude empty or Unknown
+                        const artists = [...new Set(songs.value.map(s => s.artist))].filter(a => a && a !== 'Unknown').sort();
+                        allArtists.value = artists;
+
+                        // Extract unique themes dynamically
+                        const themes = [...new Set(songs.value.flatMap(s => s.themes))].sort();
+                        allThemes.value = themes;
+
+                        lucide.createIcons();
+                    } catch (e) {
+                        console.error('Failed to load songs:', e);
+                        if (!errorMsg.value) {
+                            errorMsg.value = 'データの読み込みに失敗しました。サーバーが起動しているか確認してください。';
+                        }
+                    }
+                });
+
+                watch(currentSong, (newVal) => {
+                    if (newVal) {
+                        setTimeout(() => lucide.createIcons(), 0);
+                    }
+                });
+
+                const filteredSongs = computed(() => {
+                    let result = songs.value;
+
+                    if (searchQuery.value) {
+                        const q = searchQuery.value.toLowerCase();
+                        result = result.filter(s =>
+                            s.title.toLowerCase().includes(q) ||
+                            s.artist.toLowerCase().includes(q)
+                        );
+                    }
+
+                    if (selectedThemes.value.length > 0) {
+                        // AND filter: matches all of the selected themes
+                        result = result.filter(s =>
+                            selectedThemes.value.every(t => s.themes.includes(t))
+                        );
+                    }
+
+                    if (selectedArtist.value) {
+                        result = result.filter(s => s.artist === selectedArtist.value);
+                    }
+
+                    // Sort
+                    if (sortBy.value === 'year-desc') {
+                        result.sort((a, b) => {
+                            if (a.release_year === 'Unknown') return 1;
+                            if (b.release_year === 'Unknown') return -1;
+                            return b.release_year.localeCompare(a.release_year);
+                        });
+                    } else if (sortBy.value === 'year-asc') {
+                        result.sort((a, b) => {
+                            if (a.release_year === 'Unknown') return 1;
+                            if (b.release_year === 'Unknown') return -1;
+                            return a.release_year.localeCompare(b.release_year);
+                        });
+                    } else if (sortBy.value === 'title') {
+                        result.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
+                    }
+
+                    return result;
+                });
+
+                const slicedSongs = computed(() => filteredSongs.value.slice(0, displayLimit.value));
+
+                const openSong = (song) => {
+                    currentSong.value = song;
+                };
+
+                const toggleTheme = (theme) => {
+                    const index = selectedThemes.value.indexOf(theme);
+                    if (index > -1) {
+                        selectedThemes.value.splice(index, 1);
+                    } else {
+                        selectedThemes.value.push(theme);
+                    }
+                };
+
+                const pickRandomSong = () => {
+                    if (filteredSongs.value.length === 0) return;
+                    const randomIndex = Math.floor(Math.random() * filteredSongs.value.length);
+                    openSong(filteredSongs.value[randomIndex]);
+                };
+
+                return {
+                    songs,
+                    searchQuery,
+                    selectedThemes,
+                    selectedArtist,
+                    sortBy,
+                    displayLimit,
+                    currentSong,
+                    allThemes,
+                    allArtists,
+                    filteredSongs,
+                    slicedSongs,
+                    openSong,
+                    toggleTheme,
+                    pickRandomSong,
+                    errorMsg
+                };
+            }
+        }).mount('#app');
+    </script>
+
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 0.3s;
+        }
+
+        .fade-enter-from,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        /* Modal scrollbar */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</body>
+
+</html>

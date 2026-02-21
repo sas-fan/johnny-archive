@@ -128,24 +128,13 @@
             </div>
 
             <div v-if="viewMode === 'albums'" class="album-grid">
-                <div v-for="album in sortedAlbums" :key="album.title" class="album-card">
-                    <a :href="getAmazonLink(album.songs[0].artist, album.title)" target="_blank"
-                        rel="noopener noreferrer" class="album-image-link" title="Amazonで購入する">
-                        <div v-if="album.image" class="album-cover"
-                            :style="{ backgroundImage: 'url(' + album.image + ')' }">
-                            <div class="amazon-overlay"><i data-lucide="shopping-cart"></i></div>
-                        </div>
-                        <div v-else class="album-icon"><i data-lucide="disc-3" style="width:40px; height:40px;"></i>
-                        </div>
-                    </a>
-                    <div class="album-info" @click="filterByAlbum(album.title)" title="このアルバムの曲を見る"
-                        style="cursor:pointer; width:100%; margin-top: 16px;">
-                        <div class="album-title">{{ album.title }}</div>
-                        <div class="album-date">{{ album.date }}</div>
-                        <div class="album-category">{{ album.category }}</div>
-                        <div class="album-tracks-badge">{{ album.songs.length }} Tracks <i data-lucide="chevron-right"
-                                style="width:14px; height:14px; vertical-align:middle; margin-left: 4px;"></i></div>
-                    </div>
+                <div v-for="album in sortedAlbums" :key="album.title" class="album-card"
+                    @click="filterByAlbum(album.title)">
+                    <div class="album-icon"><i data-lucide="disc-3" style="width:40px; height:40px;"></i></div>
+                    <div class="album-title">{{ album.title }}</div>
+                    <div class="album-date">{{ album.date }}</div>
+                    <div class="album-category">{{ album.category }}</div>
+                    <div class="album-tracks-badge">{{ album.songs.length }} Tracks</div>
                 </div>
             </div>
 
@@ -218,28 +207,15 @@
 
                     <div class="album-list">
                         <h3 style="margin-bottom: 20px;">Included in</h3>
-                        <a v-for="album in currentSong.albums" :key="album.title"
-                            :href="getAmazonLink(currentSong.artist, album.title)" target="_blank"
-                            rel="noopener noreferrer" class="album-item u-hover-zoom"
-                            style="display: flex; gap: 16px; text-decoration: none; align-items: center; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; transition: background 0.2s; border: 1px solid var(--border-color); margin-bottom: 12px;">
-                            <div v-if="album.image" class="album-thumb"
-                                :style="{ backgroundImage: 'url(' + album.image + ')' }"></div>
-                            <div v-else class="album-icon-small"><i data-lucide="disc"></i></div>
-                            <div style="flex: 1; text-align: left;">
-                                <div style="color: var(--text-primary);"><span style="font-weight: 700;">{{ album.title
-                                        }}</span>
-                                    <span
-                                        style="font-size: 0.8rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; margin-left:8px; color: var(--text-secondary);">{{
-                                        album.category }}</span>
-                                </div>
-                                <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">{{
-                                    album.date }}</div>
+                        <div v-for="album in currentSong.albums" class="album-item">
+                            <div>
+                                <span style="font-weight: 700;">{{ album.title }}</span>
+                                <span
+                                    style="font-size: 0.8rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; margin-left:8px;">{{
+                                    album.category }}</span>
                             </div>
-                            <div
-                                style="color: var(--accent-orange); display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: bold;">
-                                <i data-lucide="shopping-cart" style="width: 18px;"></i>
-                            </div>
-                        </a>
+                            <div style="color: var(--text-secondary);">{{ album.date }}</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -276,33 +252,9 @@
                         if (!response.ok) throw new Error('Network response was not ok');
                         songs.value = await response.json();
 
-                        // Extract unique artists, exclude empty or Unknown, and apply custom order
-                        const baseArtists = [...new Set(songs.value.map(s => s.artist_group))].filter(a => a && a !== 'Unknown');
-                        const artistOrder = [
-                            "サザンオールスターズ",
-                            "桑田佳祐",
-                            "原由子",
-                            "松田弘",    // Assuming 松田浩 meant 松田弘 based on SAS members
-                            "関口和之",
-                            "KUWATA BAND"
-                        ];
-
-                        // Sort artists: ordered items first, then alphabetical, then OTHER at the absolute end
-                        baseArtists.sort((a, b) => {
-                            if (a === 'OTHER') return 1;
-                            if (b === 'OTHER') return -1;
-
-                            const indexA = artistOrder.indexOf(a);
-                            const indexB = artistOrder.indexOf(b);
-
-                            if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-                            if (indexA !== -1) return -1;
-                            if (indexB !== -1) return 1;
-
-                            return a.localeCompare(b, 'ja');
-                        });
-
-                        allArtists.value = baseArtists;
+                        // Extract unique artists, exclude empty or Unknown
+                        const artists = [...new Set(songs.value.map(s => s.artist))].filter(a => a && a !== 'Unknown').sort();
+                        allArtists.value = artists;
 
                         // Extract unique themes dynamically
                         const themes = [...new Set(songs.value.flatMap(s => s.themes))].sort();
@@ -353,7 +305,7 @@
                     }
 
                     if (selectedArtist.value) {
-                        result = result.filter(s => s.artist_group === selectedArtist.value);
+                        result = result.filter(s => s.artist === selectedArtist.value);
                     }
 
                     // Sort
@@ -417,7 +369,6 @@
                                         title: a.title,
                                         date: a.date,
                                         category: a.category,
-                                        image: a.image,
                                         songs: []
                                     });
                                 }
@@ -432,11 +383,6 @@
                         return b.date.localeCompare(a.date);
                     });
                 });
-
-                const getAmazonLink = (artist, albumTitle) => {
-                    const searchArtist = artist === 'OTHER' || artist === 'Unknown' ? 'サザンオールスターズ' : artist;
-                    return `https://music.amazon.co.jp/search/${encodeURIComponent(searchArtist + ' ' + albumTitle)}?tag=sasfanjohnny-22`;
-                };
 
                 watch(viewMode, () => {
                     setTimeout(() => lucide.createIcons(), 0);
@@ -464,7 +410,6 @@
                     pickRandomSong,
                     filterByAlbum,
                     clearAlbumFilter,
-                    getAmazonLink,
                     errorMsg
                 };
             }

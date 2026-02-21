@@ -41,11 +41,24 @@
         </header>
 
         <main>
+            <div class="view-tabs">
+                <button class="view-tab" :class="{ active: viewMode === 'songs' }" @click="viewMode = 'songs'"><i
+                        data-lucide="music"></i> SONGS</button>
+                <button class="view-tab" :class="{ active: viewMode === 'albums' }" @click="viewMode = 'albums'"><i
+                        data-lucide="disc"></i> ALBUMS</button>
+            </div>
+
             <div v-if="errorMsg" class="error-banner">
                 <i data-lucide="alert-triangle"></i> {{ errorMsg }}
             </div>
 
-            <div class="controls">
+            <div v-if="viewMode === 'songs' && selectedAlbumFilter" class="active-album-banner">
+                <div style="display:flex; align-items:center; gap:8px;"><i data-lucide="disc"></i> 収録アルバム: <strong>{{
+                        selectedAlbumFilter }}</strong></div>
+                <button class="clear-btn" @click="clearAlbumFilter"><i data-lucide="x"></i> 絞り込み解除</button>
+            </div>
+
+            <div class="controls" v-show="viewMode === 'songs'">
                 <div class="filter-row">
                     <div class="filter-group">
                         <span class="filter-label">Artist</span>
@@ -74,6 +87,20 @@
                     </div>
                 </div>
 
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <span class="filter-label">Mood</span>
+                        <div class="tag-scroll">
+                            <div class="tag" :class="{ active: selectedMood === '' }" @click="selectedMood = ''">All
+                            </div>
+                            <div v-for="mood in allMoods" :key="mood" class="tag"
+                                :class="{ active: selectedMood === mood }" @click="selectedMood = mood">
+                                {{ mood }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="filter-row bottom-row">
                     <div class="filter-group">
                         <span class="filter-label">Sort</span>
@@ -86,18 +113,33 @@
                 </div>
             </div>
 
-            <div class="song-grid">
+            <div class="song-grid" v-show="viewMode === 'songs'">
                 <div v-for="song in slicedSongs" :key="song.id" class="song-card" @click="openSong(song)">
                     <div class="year">{{ song.release_year }}</div>
                     <div class="title">{{ song.title }}</div>
                     <div class="artist">{{ song.artist }}</div>
                     <div class="themes">
+                        <span v-if="song.mood" class="theme-badge"
+                            style="background: rgba(251, 146, 60, 0.2); color: var(--accent-orange);">{{ song.mood
+                            }}</span>
                         <span v-for="theme in song.themes" :key="theme" class="theme-badge">{{ theme }}</span>
                     </div>
                 </div>
             </div>
 
-            <div v-if="filteredSongs.length > displayLimit" style="text-align: center; padding: 40px;">
+            <div v-if="viewMode === 'albums'" class="album-grid">
+                <div v-for="album in sortedAlbums" :key="album.title" class="album-card"
+                    @click="filterByAlbum(album.title)">
+                    <div class="album-icon"><i data-lucide="disc-3" style="width:40px; height:40px;"></i></div>
+                    <div class="album-title">{{ album.title }}</div>
+                    <div class="album-date">{{ album.date }}</div>
+                    <div class="album-category">{{ album.category }}</div>
+                    <div class="album-tracks-badge">{{ album.songs.length }} Tracks</div>
+                </div>
+            </div>
+
+            <div v-if="viewMode === 'songs' && filteredSongs.length > displayLimit"
+                style="text-align: center; padding: 40px;">
                 <button class="tag" @click="displayLimit += 48" style="padding: 12px 40px; font-size: 1rem;">Load
                     More</button>
             </div>
@@ -128,6 +170,9 @@
                             currentSong.artist }}</div>
 
                         <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                            <span v-if="currentSong.mood" class="tag active"
+                                style="background: var(--accent-orange); border-color: var(--accent-orange); cursor: default; pointer-events: none;">{{
+                                currentSong.mood }}</span>
                             <span v-for="theme in currentSong.themes" :key="theme" class="tag active"
                                 style="cursor: default; pointer-events: none;">{{ theme }}</span>
                         </div>
@@ -185,14 +230,18 @@
                 const songs = ref([]);
                 const searchQuery = ref('');
                 const selectedThemes = ref([]);
+                const selectedMood = ref('');
+                const selectedAlbumFilter = ref('');
                 const selectedArtist = ref('');
                 const sortBy = ref('year-desc');
                 const displayLimit = ref(48);
                 const currentSong = ref(null);
 
                 const allThemes = ref([]);
+                const allMoods = ref([]);
                 const allArtists = ref([]);
                 const errorMsg = ref('');
+                const viewMode = ref('songs');
 
                 onMounted(async () => {
                     if (window.location.protocol === 'file:') {
@@ -210,6 +259,9 @@
                         // Extract unique themes dynamically
                         const themes = [...new Set(songs.value.flatMap(s => s.themes))].sort();
                         allThemes.value = themes;
+
+                        const moods = [...new Set(songs.value.map(s => s.mood))].filter(Boolean);
+                        allMoods.value = moods;
 
                         lucide.createIcons();
                     } catch (e) {
@@ -242,6 +294,14 @@
                         result = result.filter(s =>
                             selectedThemes.value.every(t => s.themes.includes(t))
                         );
+                    }
+
+                    if (selectedMood.value) {
+                        result = result.filter(s => s.mood === selectedMood.value);
+                    }
+
+                    if (selectedAlbumFilter.value) {
+                        result = result.filter(s => s.albums && s.albums.some(a => a.title === selectedAlbumFilter.value));
                     }
 
                     if (selectedArtist.value) {
@@ -285,25 +345,71 @@
 
                 const pickRandomSong = () => {
                     if (filteredSongs.value.length === 0) return;
+                    viewMode.value = 'songs'; // switch back to songs view to see the filtered list context
                     const randomIndex = Math.floor(Math.random() * filteredSongs.value.length);
                     openSong(filteredSongs.value[randomIndex]);
                 };
+
+                const filterByAlbum = (title) => {
+                    selectedAlbumFilter.value = title;
+                    viewMode.value = 'songs';
+                };
+
+                const clearAlbumFilter = () => {
+                    selectedAlbumFilter.value = '';
+                };
+
+                const sortedAlbums = computed(() => {
+                    const albumMap = new Map();
+                    songs.value.forEach(s => {
+                        if (s.albums) {
+                            s.albums.forEach(a => {
+                                if (!albumMap.has(a.title)) {
+                                    albumMap.set(a.title, {
+                                        title: a.title,
+                                        date: a.date,
+                                        category: a.category,
+                                        songs: []
+                                    });
+                                }
+                                albumMap.get(a.title).songs.push(s);
+                            });
+                        }
+                    });
+                    return Array.from(albumMap.values()).sort((a, b) => {
+                        if (!a.date && !b.date) return 0;
+                        if (!a.date) return 1;
+                        if (!b.date) return -1;
+                        return b.date.localeCompare(a.date);
+                    });
+                });
+
+                watch(viewMode, () => {
+                    setTimeout(() => lucide.createIcons(), 0);
+                });
 
                 return {
                     songs,
                     searchQuery,
                     selectedThemes,
+                    selectedMood,
+                    selectedAlbumFilter,
                     selectedArtist,
                     sortBy,
                     displayLimit,
                     currentSong,
                     allThemes,
+                    allMoods,
+                    viewMode,
                     allArtists,
                     filteredSongs,
+                    sortedAlbums,
                     slicedSongs,
                     openSong,
                     toggleTheme,
                     pickRandomSong,
+                    filterByAlbum,
+                    clearAlbumFilter,
                     errorMsg
                 };
             }

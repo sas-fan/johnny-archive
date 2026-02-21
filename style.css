@@ -111,14 +111,20 @@ header {
 
 .controls {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px 32px;
     padding: 20px 40px;
     margin-bottom: 10px;
 }
 
 .filter-row {
-    width: 100%;
+    flex: 1 1 300px;
+    min-width: 0;
+}
+
+.filter-row.bottom-row {
+    flex: 1 1 100%;
 }
 
 .filter-group {
@@ -648,7 +654,14 @@ footer {
     }
 
     .controls {
+        flex-direction: column;
+        flex-wrap: nowrap;
         padding: 20px;
+        gap: 12px;
+    }
+
+    .filter-row {
+        flex: 1 1 auto;
     }
 
     .filter-label {

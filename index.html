@@ -252,9 +252,33 @@
                         if (!response.ok) throw new Error('Network response was not ok');
                         songs.value = await response.json();
 
-                        // Extract unique artists, exclude empty or Unknown
-                        const artists = [...new Set(songs.value.map(s => s.artist))].filter(a => a && a !== 'Unknown').sort();
-                        allArtists.value = artists;
+                        // Extract unique artists, exclude empty or Unknown, and apply custom order
+                        const baseArtists = [...new Set(songs.value.map(s => s.artist_group))].filter(a => a && a !== 'Unknown');
+                        const artistOrder = [
+                            "サザンオールスターズ",
+                            "桑田佳祐",
+                            "原由子",
+                            "松田弘",    // Assuming 松田浩 meant 松田弘 based on SAS members
+                            "関口和之",
+                            "KUWATA BAND"
+                        ];
+
+                        // Sort artists: ordered items first, then alphabetical, then OTHER at the absolute end
+                        baseArtists.sort((a, b) => {
+                            if (a === 'OTHER') return 1;
+                            if (b === 'OTHER') return -1;
+
+                            const indexA = artistOrder.indexOf(a);
+                            const indexB = artistOrder.indexOf(b);
+
+                            if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+                            if (indexA !== -1) return -1;
+                            if (indexB !== -1) return 1;
+
+                            return a.localeCompare(b, 'ja');
+                        });
+
+                        allArtists.value = baseArtists;
 
                         // Extract unique themes dynamically
                         const themes = [...new Set(songs.value.flatMap(s => s.themes))].sort();
@@ -305,7 +329,7 @@
                     }
 
                     if (selectedArtist.value) {
-                        result = result.filter(s => s.artist === selectedArtist.value);
+                        result = result.filter(s => s.artist_group === selectedArtist.value);
                     }
 
                     // Sort

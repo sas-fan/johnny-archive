@@ -25,7 +25,7 @@ body {
         radial-gradient(at 100% 0%, rgba(251, 146, 60, 0.1) 0, transparent 50%);
     color: var(--text-primary);
     min-height: 100vh;
-    padding-top: 80px;
+    padding-top: 100px;
     overflow-x: hidden;
 }
 
@@ -34,13 +34,13 @@ header {
     top: 0;
     left: 0;
     right: 0;
-    height: 80px;
+    min-height: 80px;
     background: rgba(12, 20, 36, 0.8);
     backdrop-filter: var(--glass-blur);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 40px;
+    padding: 12px 40px;
     z-index: 1000;
     border-bottom: 1px solid var(--border-color);
 }
@@ -49,12 +49,19 @@ header {
     display: flex;
     align-items: center;
     gap: 20px;
+    flex-shrink: 0;
 }
 
 .stats {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     white-space: nowrap;
+}
+
+.stats strong {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
 }
 
 .logo {
@@ -116,26 +123,16 @@ header {
 
 .filter-group {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
 }
 
 .tag-scroll {
     display: flex;
+    flex-wrap: wrap;
+    /* Restore wrap for PC */
     gap: 8px;
-    overflow-x: auto;
-    padding: 4px 0;
-    -webkit-overflow-scrolling: touch;
     flex: 1;
-}
-
-.tag-scroll::-webkit-scrollbar {
-    height: 4px;
-}
-
-.tag-scroll::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
 }
 
 .filter-label {
@@ -144,9 +141,13 @@ header {
     text-transform: uppercase;
     letter-spacing: 0.1em;
     min-width: 80px;
+    padding-top: 6px;
 }
 
 .tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     padding: 6px 14px;
     border-radius: 100px;
@@ -506,6 +507,20 @@ footer {
     .filter-label {
         min-width: 60px;
         font-size: 0.7rem;
+        padding-top: 8px;
+    }
+
+    .tag-scroll {
+        flex-wrap: nowrap;
+        /* Horizontal scroll only for mobile */
+        overflow-x: auto;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tag-scroll::-webkit-scrollbar {
+        height: 0px;
+        /* Hide scrollbar for a cleaner mobile look */
     }
 
     .modal-content {

@@ -9,7 +9,7 @@
     <meta property="og:title" content="SAS Song Archive & Database">
     <meta property="og:description" content="サザンオールスターズ＆関連アーティストの楽曲データベース">
     <meta property="og:type" content="website">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2.0">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;700&display=swap"
         rel="stylesheet">
@@ -31,12 +31,12 @@
                 <input type="text" v-model="searchQuery" class="search-input" placeholder="曲名、アーティスト、歌詞で検索...">
             </div>
             <div class="header-right">
+                <div class="stats">
+                    <strong>{{ filteredSongs.length }}</strong> Tracks
+                </div>
                 <button class="random-btn" @click="pickRandomSong" title="ランダム選曲">
                     <i data-lucide="shuffle"></i><span>RANDOM</span>
                 </button>
-                <div class="stats">
-                    {{ filteredSongs.length }} Tracks
-                </div>
             </div>
         </header>
 
@@ -127,8 +127,9 @@
                         <div style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 24px;">{{
                             currentSong.artist }}</div>
 
-                        <div class="themes" style="justify-content: center; gap: 10px;">
-                            <span v-for="theme in currentSong.themes" :key="theme" class="tag active">{{ theme }}</span>
+                        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                            <span v-for="theme in currentSong.themes" :key="theme" class="tag active"
+                                style="cursor: default; pointer-events: none;">{{ theme }}</span>
                         </div>
                     </div>
 

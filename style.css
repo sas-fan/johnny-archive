@@ -45,6 +45,18 @@ header {
     border-bottom: 1px solid var(--border-color);
 }
 
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.stats {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
 .logo {
     display: flex;
     align-items: center;
@@ -93,16 +105,37 @@ header {
 .controls {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
     padding: 20px 40px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+}
+
+.filter-row {
+    width: 100%;
 }
 
 .filter-group {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
     align-items: center;
+    gap: 12px;
+}
+
+.tag-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+}
+
+.tag-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+
+.tag-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
 }
 
 .filter-label {
@@ -110,20 +143,20 @@ header {
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-right: 8px;
-    width: 100px;
+    min-width: 80px;
 }
 
 .tag {
     cursor: pointer;
-    padding: 6px 16px;
+    padding: 6px 14px;
     border-radius: 100px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
     transition: all 0.2s ease;
     user-select: none;
+    white-space: nowrap;
 }
 
 .tag:hover {
@@ -426,25 +459,40 @@ footer {
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     header {
         padding: 0 20px;
-        flex-direction: column;
-        height: auto;
-        padding-bottom: 16px;
-    }
-
-    .logo {
-        margin-top: 16px;
     }
 
     .search-container {
-        margin: 16px 0;
+        margin: 0 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        height: auto;
+        padding: 16px 20px;
+        gap: 16px;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .logo-area {
+        text-align: center;
+    }
+
+    .search-container {
+        margin: 0;
         width: 100%;
     }
 
     body {
-        padding-top: 140px;
+        padding-top: 190px;
     }
 
     .song-grid {
@@ -453,5 +501,19 @@ footer {
 
     .controls {
         padding: 20px;
+    }
+
+    .filter-label {
+        min-width: 60px;
+        font-size: 0.7rem;
+    }
+
+    .modal-content {
+        padding: 20px;
+        border-radius: 20px;
+    }
+
+    .link-btn {
+        width: 100%;
     }
 }

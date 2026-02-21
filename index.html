@@ -30,8 +30,13 @@
             <div class="search-container">
                 <input type="text" v-model="searchQuery" class="search-input" placeholder="曲名、アーティスト、歌詞で検索...">
             </div>
-            <div class="stats" style="color: var(--text-secondary); font-size: 0.9rem;">
-                {{ filteredSongs.length }} Tracks
+            <div class="header-right">
+                <button class="random-btn" @click="pickRandomSong" title="ランダム選曲">
+                    <i data-lucide="shuffle"></i><span>RANDOM</span>
+                </button>
+                <div class="stats">
+                    {{ filteredSongs.length }} Tracks
+                </div>
             </div>
         </header>
 
@@ -41,37 +46,43 @@
             </div>
 
             <div class="controls">
-                <div class="filter-group">
-                    <span class="filter-label">Themes</span>
-                    <div class="tag" :class="{ active: selectedThemes.length === 0 }" @click="selectedThemes = []">All
-                    </div>
-                    <div v-for="theme in allThemes" :key="theme" class="tag"
-                        :class="{ active: selectedThemes.includes(theme) }" @click="toggleTheme(theme)">
-                        {{ theme }}
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <span class="filter-label">Artist</span>
-                    <div class="tag" :class="{ active: selectedArtist === '' }" @click="selectedArtist = ''">All</div>
-                    <div v-for="artist in allArtists" :key="artist" class="tag"
-                        :class="{ active: selectedArtist === artist }" @click="selectedArtist = artist">
-                        {{ artist }}
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <span class="filter-label">Artist</span>
+                        <div class="tag-scroll">
+                            <div class="tag" :class="{ active: selectedArtist === '' }" @click="selectedArtist = ''">All
+                            </div>
+                            <div v-for="artist in allArtists" :key="artist" class="tag"
+                                :class="{ active: selectedArtist === artist }" @click="selectedArtist = artist">
+                                {{ artist }}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="filter-group">
-                    <span class="filter-label">Sort</span>
-                    <div class="tag" :class="{ active: sortBy === 'year-desc' }" @click="sortBy = 'year-desc'">Newer
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <span class="filter-label">Themes</span>
+                        <div class="tag-scroll">
+                            <div class="tag" :class="{ active: selectedThemes.length === 0 }"
+                                @click="selectedThemes = []">All</div>
+                            <div v-for="theme in allThemes" :key="theme" class="tag"
+                                :class="{ active: selectedThemes.includes(theme) }" @click="toggleTheme(theme)">
+                                {{ theme }}
+                            </div>
+                        </div>
                     </div>
-                    <div class="tag" :class="{ active: sortBy === 'year-asc' }" @click="sortBy = 'year-asc'">Older</div>
-                    <div class="tag" :class="{ active: sortBy === 'title' }" @click="sortBy = 'title'">A-Z</div>
                 </div>
 
-                <div class="filter-group">
-                    <button class="random-btn" @click="pickRandomSong">
-                        <i data-lucide="shuffle"></i> Random Pick
-                    </button>
+                <div class="filter-row bottom-row">
+                    <div class="filter-group">
+                        <span class="filter-label">Sort</span>
+                        <div class="tag" :class="{ active: sortBy === 'year-desc' }" @click="sortBy = 'year-desc'">Newer
+                        </div>
+                        <div class="tag" :class="{ active: sortBy === 'year-asc' }" @click="sortBy = 'year-asc'">Older
+                        </div>
+                        <div class="tag" :class="{ active: sortBy === 'title' }" @click="sortBy = 'title'">A-Z</div>
+                    </div>
                 </div>
             </div>
 

@@ -62,14 +62,14 @@
         <main>
             <div class="view-tabs">
                 <button class="view-tab" :class="{ active: viewMode === 'songs' }" @click="viewMode = 'songs'">
-                    <i data-lucide="music"></i> SONGS
+                    <i data-lucide="music"></i><span class="tab-label">SONGS</span>
                 </button>
                 <button class="view-tab" :class="{ active: viewMode === 'albums' }" @click="viewMode = 'albums'">
-                    <i data-lucide="disc"></i> ALBUMS
+                    <i data-lucide="disc"></i><span class="tab-label">ALBUMS</span>
                 </button>
                 <button class="view-tab favorites-tab" :class="{ active: viewMode === 'favorites' }"
                     @click="viewMode = 'favorites'">
-                    <i data-lucide="heart"></i> FAVORITES
+                    <i data-lucide="heart"></i><span class="tab-label">FAVORITES</span>
                     <span v-if="favoriteIds.length > 0" class="fav-count-badge">{{ favoriteIds.length }}</span>
                 </button>
             </div>

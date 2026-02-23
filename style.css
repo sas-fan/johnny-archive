@@ -1218,60 +1218,79 @@ kbd {
 
     .random-btn {
         padding: 0;
-        width: 42px;
-        height: 42px;
+        width: 40px;
+        height: 40px;
         justify-content: center;
         flex-shrink: 0;
     }
 
+    /* ヘッダー高さを JS が計算するので固定値は削除 */
     body {
-        padding-top: 130px;
+        padding-top: 120px;
     }
 
+    /* ===== Tab bar: 3タブを均等に並べる ===== */
+    .view-tabs {
+        gap: 8px;
+        padding: 8px 16px 4px;
+    }
+    .view-tab {
+        flex: 1;                  /* 均等幅 */
+        padding: 10px 8px;
+        font-size: 0.78rem;
+        gap: 5px;
+        justify-content: center;
+        min-width: 0;
+    }
+    .view-tab i {
+        width: 15px;
+        height: 15px;
+        flex-shrink: 0;
+    }
+    /* FAVORITESのバッジが溢れないよう */
+    .fav-count-badge {
+        font-size: 0.6rem;
+        padding: 1px 4px;
+        margin-left: 3px;
+    }
+    /* タブのラベルテキストを短縮 */
+    .tab-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+    }
+
+    /* ===== Grids ===== */
     .song-grid {
         grid-template-columns: 1fr;
         padding: 0 16px 20px;
-        gap: 16px;
+        gap: 12px;
     }
 
-    .album-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        padding: 0 16px 20px;
-        gap: 16px;
-    }
-
+    /* ===== Filter controls ===== */
     .controls {
         flex-direction: column;
-        padding: 12px 16px;
-        gap: 12px;
+        padding: 8px 16px;
+        gap: 10px;
         width: 100%;
-        /* overflow-x は設定しない：子の .tag-scroll の横スクロールを妨げないため */
     }
-
-    .filter-row {
-        width: 100%;
-        min-width: 0;
-        /* 重要: 子のスクロールを可能にする */
-    }
-
+    .filter-row { width: 100%; min-width: 0; }
     .filter-group {
         flex-direction: column;
         align-items: flex-start;
         gap: 6px;
         width: 100%;
         min-width: 0;
-        /* 重要 */
     }
-
     .filter-label {
-        font-size: 0.7rem;
+        font-size: 0.68rem;
         min-width: unset;
         font-weight: 800;
         color: var(--accent-blue);
         opacity: 0.9;
         padding-top: 0;
     }
-
     .tag-scroll {
         display: flex;
         flex-direction: row;
@@ -1280,51 +1299,63 @@ kbd {
         overflow-y: hidden;
         width: 100%;
         gap: 8px;
-        padding: 4px 0 12px;
+        padding: 4px 0 10px;
         -webkit-overflow-scrolling: touch;
         scroll-snap-type: x proximity;
     }
-
-    .tag-scroll::-webkit-scrollbar {
-        display: none;
-        /* スクロールバーを隠す */
-    }
-
+    .tag-scroll::-webkit-scrollbar { display: none; }
     .tag {
         flex: 0 0 auto;
-        /* 勝手に縮まないように固定 */
         scroll-snap-align: start;
+        font-size: 0.75rem;
+        padding: 5px 12px;
     }
 
-    .modal-overlay {
-        padding: 12px;
-    }
+    /* ===== Active album banner ===== */
+    .active-album-banner { margin: 0 16px 16px; }
 
-    .modal-content {
-        padding: 24px 16px;
-        border-radius: 20px;
-    }
+    /* ===== Song cards ===== */
+    .song-card { padding: 18px; }
+    .song-card .title { font-size: 1.1rem; }
 
-    /* Mobile: album list view */
-    .album-list-view { padding: 0 16px 20px; }
-    .album-row { gap: 12px; padding: 14px 14px; }
-    .album-row-left { width: 60px; }
-    .album-row-amazon { display: none; }
-    .album-modal-header { flex-direction: column; gap: 16px; }
-    .album-modal-icon { width: 60px; height: 60px; }
+    /* ===== Album list view ===== */
+    .album-list-view { padding: 0 16px 20px; gap: 5px; }
+    .album-row { gap: 10px; padding: 12px 14px; }
+    .album-row-left { width: 56px; gap: 4px; }
+    .album-row-year { font-size: 0.7rem; }
+    .album-row-title { font-size: 0.9rem; }
+    .album-row-meta { font-size: 0.75rem; }
+    .album-row-amazon { display: none; }   /* スペース節約 */
+    .album-row-chevron { display: block; } /* → は残す */
+
+    /* ===== Album modal ===== */
+    .album-modal-header { flex-direction: column; gap: 12px; }
+    .album-modal-icon { width: 56px; height: 56px; }
+    .album-modal-icon i { width: 26px; height: 26px; }
     .album-modal-title { font-size: 1.2rem; }
 
-    /* Mobile: similar grid 1 col */
-    .similar-grid { grid-template-columns: 1fr; }
-
-    /* Mobile: modal nav position */
+    /* ===== Modals ===== */
+    .modal-overlay { padding: 8px; }
+    .modal-content { padding: 20px 14px; border-radius: 20px; }
+    .modal-top-bar { margin-bottom: 16px; }
     .modal-nav { width: 36px; height: 36px; }
+    .modal-close-inline { width: 36px; height: 36px; }
 
-    /* Mobile: Amazon CTA */
-    .amazon-cta-btn { font-size: 0.9rem; padding: 12px 24px; }
+    /* ===== Song modal body ===== */
+    .modal-content h2 { font-size: 1.6rem !important; }
+    .amazon-cta { margin: 20px 0 0; }
+    .amazon-cta-btn { font-size: 0.88rem; padding: 11px 20px; }
+    .external-links { gap: 10px; margin-top: 20px; }
+    .link-btn { padding: 10px 16px; font-size: 0.85rem; }
 
-    /* Mobile: shortcut keys */
-    .shortcut-keys { min-width: 60px; }
+    /* ===== Similar songs ===== */
+    .similar-grid { grid-template-columns: 1fr; }
+    .similar-songs { margin-top: 28px; padding-top: 28px; }
 
+    /* ===== Keyboard shortcut modal ===== */
+    .shortcut-keys { min-width: 56px; }
     .icon-btn { width: 36px; height: 36px; }
+
+    /* ===== Footer ===== */
+    footer { padding: 40px 16px; margin-top: 40px; }
 }

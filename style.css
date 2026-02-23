@@ -676,64 +676,82 @@ footer {
     header {
         flex-direction: column;
         height: auto;
-        padding: 12px 16px;
-        gap: 8px;
-    }
-
-    .logo {
-        font-size: 1.1rem;
-        justify-content: center;
-        width: 100%;
-    }
-
-    .subtitle {
-        font-size: 0.55rem;
-        display: block;
-        opacity: 0.8;
-    }
-
-    .header-right {
-        width: 100%;
-        justify-content: center;
-        gap: 12px;
-    }
-
-    .stats,
-    .random-btn span {
-        display: none;
-        /* Hide stats and text on mobile */
-    }
-
-    .random-btn {
-        padding: 8px;
-        width: 40px;
-        height: 40px;
-        justify-content: center;
+        padding: 10px 16px;
+        gap: 6px;
     }
 
     .logo-area {
         text-align: center;
+        width: 100%;
+    }
+
+    .logo {
+        font-size: 1rem;
+        justify-content: center;
+    }
+
+    .subtitle {
+        font-size: 0.55rem;
+        opacity: 0.8;
     }
 
     .search-container {
         margin: 0;
         width: 100%;
+        max-width: none;
     }
 
+    .header-right {
+        width: 100%;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    .stats {
+        display: none;
+    }
+
+    .random-btn span {
+        display: none;
+    }
+
+    .random-btn {
+        padding: 8px;
+        width: 36px;
+        height: 36px;
+        justify-content: center;
+    }
+
+    /* Dynamic padding handled by JS - fallback value */
     body {
-        padding-top: 135px;
-        /* Precision adjustment */
+        padding-top: 180px;
     }
 
     .song-grid {
-        padding: 0 20px 20px;
+        grid-template-columns: 1fr;
+        padding: 0 12px 20px;
+        gap: 12px;
+    }
+
+    .album-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        padding: 0 12px 20px;
+        gap: 12px;
+    }
+
+    .active-album-banner {
+        margin: 0 12px 12px;
+    }
+
+    .error-banner {
+        margin: 12px;
     }
 
     .controls {
         flex-direction: column;
         flex-wrap: nowrap;
-        padding: 20px;
-        gap: 12px;
+        padding: 12px;
+        gap: 10px;
     }
 
     .filter-row {
@@ -742,35 +760,41 @@ footer {
 
     .filter-group {
         flex-direction: column;
-        /* Vertical for mobile only */
-        gap: 8px;
+        gap: 6px;
     }
 
     .filter-label {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         min-width: unset;
         font-weight: 700;
+        letter-spacing: 0.1em;
     }
 
+    /* All tag rows (including sort) scroll horizontally on mobile */
     .tag-scroll {
         flex-wrap: nowrap;
         overflow-x: auto;
-        padding-bottom: 8px;
+        padding-bottom: 6px;
         -webkit-overflow-scrolling: touch;
         width: 100%;
     }
 
     .tag-scroll::-webkit-scrollbar {
-        height: 0px;
-        /* Hide scrollbar for a cleaner mobile look */
+        height: 0;
+    }
+
+    .modal-overlay {
+        padding: 12px;
     }
 
     .modal-content {
         padding: 20px;
         border-radius: 20px;
+        max-height: 95vh;
     }
 
     .link-btn {
-        width: 100%;
+        padding: 10px 16px;
+        font-size: 0.85rem;
     }
 }

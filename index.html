@@ -119,11 +119,13 @@
                 <div class="filter-row bottom-row">
                     <div class="filter-group">
                         <span class="filter-label">Sort</span>
-                        <div class="tag" :class="{ active: sortBy === 'year-desc' }" @click="sortBy = 'year-desc'">Newer
+                        <div class="tag-scroll">
+                            <div class="tag" :class="{ active: sortBy === 'year-desc' }" @click="sortBy = 'year-desc'">
+                                Newer</div>
+                            <div class="tag" :class="{ active: sortBy === 'year-asc' }" @click="sortBy = 'year-asc'">
+                                Older</div>
+                            <div class="tag" :class="{ active: sortBy === 'title' }" @click="sortBy = 'title'">A-Z</div>
                         </div>
-                        <div class="tag" :class="{ active: sortBy === 'year-asc' }" @click="sortBy = 'year-asc'">Older
-                        </div>
-                        <div class="tag" :class="{ active: sortBy === 'title' }" @click="sortBy = 'title'">A-Z</div>
                     </div>
                 </div>
             </div>
@@ -142,8 +144,38 @@
                 </div>
             </div>
 
+            <!-- Album Filters -->
+            <div class="controls" v-show="viewMode === 'albums'">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <span class="filter-label">Artist</span>
+                        <div class="tag-scroll">
+                            <div class="tag" :class="{ active: albumArtistFilter === '' }"
+                                @click="albumArtistFilter = ''">All</div>
+                            <div v-for="artist in allArtists" :key="artist" class="tag"
+                                :class="{ active: albumArtistFilter === artist }" @click="albumArtistFilter = artist">
+                                {{ artist }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-row bottom-row">
+                    <div class="filter-group">
+                        <span class="filter-label">Sort</span>
+                        <div class="tag-scroll">
+                            <div class="tag" :class="{ active: albumSortBy === 'date-desc' }"
+                                @click="albumSortBy = 'date-desc'">Newer</div>
+                            <div class="tag" :class="{ active: albumSortBy === 'date-asc' }"
+                                @click="albumSortBy = 'date-asc'">Older</div>
+                            <div class="tag" :class="{ active: albumSortBy === 'title' }"
+                                @click="albumSortBy = 'title'">A-Z</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div v-if="viewMode === 'albums'" class="album-grid">
-                <div v-for="album in sortedAlbums" :key="album.title" class="album-card">
+                <div v-for="album in filteredAlbums" :key="album.title" class="album-card">
                     <a :href="getAmazonLink(album.songs[0].artist, album.title)" target="_blank"
                         rel="noopener noreferrer" class="album-image-link" title="Amazonで購入する">
                         <div v-if="album.image" class="album-cover"
@@ -209,9 +241,9 @@
                             class="link-btn lyrics-link">
                             <i data-lucide="music-4"></i> 歌詞を検索 (Uta-Net)
                         </a>
-                        <a :href="currentSong.links.amazon.replace('music.amazon.co.jp/search/', 'www.amazon.co.jp/s?k=')"
-                            target="_blank" rel="noopener noreferrer" class="link-btn amazon-link">
-                            <i data-lucide="shopping-cart"></i> Amazonで探す
+                        <a :href="currentSong.links.amazon" target="_blank" rel="noopener noreferrer"
+                            class="link-btn amazon-link">
+                            <i data-lucide="headphones"></i> Amazon Music
                         </a>
                         <a :href="currentSong.links.spotify" target="_blank" rel="noopener noreferrer"
                             class="link-btn spotify-link">
@@ -281,6 +313,8 @@
                 const allArtists = ref([]);
                 const errorMsg = ref('');
                 const viewMode = ref('songs');
+                const albumArtistFilter = ref('');
+                const albumSortBy = ref('date-desc');
 
                 onMounted(async () => {
                     if (window.location.protocol === 'file:') {
@@ -327,6 +361,16 @@
                         allMoods.value = moods;
 
                         lucide.createIcons();
+
+                        // Dynamically adjust body padding based on actual header height
+                        const adjustPadding = () => {
+                            const header = document.querySelector('header');
+                            if (header) {
+                                document.body.style.paddingTop = header.offsetHeight + 'px';
+                            }
+                        };
+                        adjustPadding();
+                        window.addEventListener('resize', adjustPadding);
                     } catch (e) {
                         console.error('Failed to load songs:', e);
                         if (!errorMsg.value) {
@@ -434,6 +478,7 @@
                                         date: a.date,
                                         category: a.category,
                                         image: a.image,
+                                        artistGroup: s.artist_group,
                                         songs: []
                                     });
                                 }
@@ -441,12 +486,39 @@
                             });
                         }
                     });
-                    return Array.from(albumMap.values()).sort((a, b) => {
-                        if (!a.date && !b.date) return 0;
-                        if (!a.date) return 1;
-                        if (!b.date) return -1;
-                        return b.date.localeCompare(a.date);
-                    });
+                    return Array.from(albumMap.values());
+                });
+
+                const filteredAlbums = computed(() => {
+                    let albums = sortedAlbums.value;
+
+                    // Filter by artist
+                    if (albumArtistFilter.value) {
+                        albums = albums.filter(a =>
+                            a.songs.some(s => s.artist_group === albumArtistFilter.value)
+                        );
+                    }
+
+                    // Sort
+                    if (albumSortBy.value === 'date-desc') {
+                        albums = [...albums].sort((a, b) => {
+                            if (!a.date && !b.date) return 0;
+                            if (!a.date) return 1;
+                            if (!b.date) return -1;
+                            return b.date.localeCompare(a.date);
+                        });
+                    } else if (albumSortBy.value === 'date-asc') {
+                        albums = [...albums].sort((a, b) => {
+                            if (!a.date && !b.date) return 0;
+                            if (!a.date) return 1;
+                            if (!b.date) return -1;
+                            return a.date.localeCompare(b.date);
+                        });
+                    } else if (albumSortBy.value === 'title') {
+                        albums = [...albums].sort((a, b) => a.title.localeCompare(b.title, 'ja'));
+                    }
+
+                    return albums;
                 });
 
                 const getAmazonLink = (artist, albumTitle) => {
@@ -467,6 +539,8 @@
                     selectedAlbumFilter,
                     selectedArtist,
                     sortBy,
+                    albumSortBy,
+                    albumArtistFilter,
                     displayLimit,
                     currentSong,
                     allThemes,
@@ -475,6 +549,7 @@
                     allArtists,
                     filteredSongs,
                     sortedAlbums,
+                    filteredAlbums,
                     slicedSongs,
                     openSong,
                     toggleTheme,

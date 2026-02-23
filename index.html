@@ -209,9 +209,9 @@
                             class="link-btn lyrics-link">
                             <i data-lucide="music-4"></i> 歌詞を検索 (Uta-Net)
                         </a>
-                        <a :href="currentSong.links.amazon" target="_blank" rel="noopener noreferrer"
-                            class="link-btn amazon-link">
-                            <i data-lucide="headphones"></i> Amazon Music
+                        <a :href="currentSong.links.amazon.replace('music.amazon.co.jp/search/', 'www.amazon.co.jp/s?k=')"
+                            target="_blank" rel="noopener noreferrer" class="link-btn amazon-link">
+                            <i data-lucide="shopping-cart"></i> Amazonで探す
                         </a>
                         <a :href="currentSong.links.spotify" target="_blank" rel="noopener noreferrer"
                             class="link-btn spotify-link">
@@ -415,6 +415,7 @@
 
                 const filterByAlbum = (title) => {
                     selectedAlbumFilter.value = title;
+                    selectedArtist.value = ''; // Clear artist filter to prevent empty results if album's artist differs
                     viewMode.value = 'songs';
                 };
 
@@ -450,7 +451,8 @@
 
                 const getAmazonLink = (artist, albumTitle) => {
                     const searchArtist = artist === 'OTHER' || artist === 'Unknown' ? 'サザンオールスターズ' : artist;
-                    return `https://music.amazon.co.jp/search/${encodeURIComponent(searchArtist + ' ' + albumTitle)}?tag=sasfanjohnny-22`;
+                    // Changed from music.amazon.co.jp to amazon.co.jp for physical products and overall availability
+                    return `https://www.amazon.co.jp/s?k=${encodeURIComponent(searchArtist + ' ' + albumTitle)}&tag=sasfanjohnny-22`;
                 };
 
                 watch(viewMode, () => {

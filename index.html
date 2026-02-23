@@ -91,8 +91,8 @@
                     <div class="filter-group">
                         <span class="filter-label">Artist</span>
                         <div class="tag-scroll">
-                            <div class="tag" :class="{ active: selectedArtist === '' }"
-                                @click="selectedArtist = ''">All</div>
+                            <div class="tag" :class="{ active: selectedArtist === '' }" @click="selectedArtist = ''">All
+                            </div>
                             <div v-for="artist in allArtists" :key="artist" class="tag"
                                 :class="{ active: selectedArtist === artist }" @click="selectedArtist = artist">
                                 {{ artist }}
@@ -106,8 +106,8 @@
                     <div class="filter-group">
                         <span class="filter-label">Decade</span>
                         <div class="tag-scroll">
-                            <div class="tag" :class="{ active: selectedDecade === '' }"
-                                @click="selectedDecade = ''">All</div>
+                            <div class="tag" :class="{ active: selectedDecade === '' }" @click="selectedDecade = ''">All
+                            </div>
                             <div v-for="d in allDecades" :key="d.value" class="tag"
                                 :class="{ active: selectedDecade === d.value }" @click="selectedDecade = d.value">
                                 {{ d.label }}
@@ -134,8 +134,8 @@
                     <div class="filter-group">
                         <span class="filter-label">Mood</span>
                         <div class="tag-scroll">
-                            <div class="tag" :class="{ active: selectedMood === '' }"
-                                @click="selectedMood = ''">All</div>
+                            <div class="tag" :class="{ active: selectedMood === '' }" @click="selectedMood = ''">All
+                            </div>
                             <div v-for="mood in allMoods" :key="mood" class="tag"
                                 :class="{ active: selectedMood === mood }" @click="selectedMood = mood">
                                 {{ mood }}
@@ -148,12 +148,11 @@
                     <div class="filter-group">
                         <span class="filter-label">Sort</span>
                         <div class="tag-scroll">
-                            <div class="tag" :class="{ active: sortBy === 'year-desc' }"
-                                @click="sortBy = 'year-desc'">Newer</div>
-                            <div class="tag" :class="{ active: sortBy === 'year-asc' }"
-                                @click="sortBy = 'year-asc'">Older</div>
-                            <div class="tag" :class="{ active: sortBy === 'title' }"
-                                @click="sortBy = 'title'">A-Z</div>
+                            <div class="tag" :class="{ active: sortBy === 'year-desc' }" @click="sortBy = 'year-desc'">
+                                Newer</div>
+                            <div class="tag" :class="{ active: sortBy === 'year-asc' }" @click="sortBy = 'year-asc'">
+                                Older</div>
+                            <div class="tag" :class="{ active: sortBy === 'title' }" @click="sortBy = 'title'">A-Z</div>
                         </div>
                     </div>
                 </div>
@@ -213,9 +212,8 @@
 
             <!-- ===== ALBUMS LIST ===== -->
             <div v-if="viewMode === 'albums'" class="album-list-view">
-                <div v-for="album in filteredAlbums" :key="album.title"
-                    class="album-row" :class="'cat-' + album.category.toLowerCase()"
-                    @click="openAlbum(album)">
+                <div v-for="album in filteredAlbums" :key="album.title" class="album-row"
+                    :class="'cat-' + album.category.toLowerCase()" @click="openAlbum(album)">
 
                     <!-- Left: category accent bar + badges -->
                     <div class="album-row-left">
@@ -237,12 +235,13 @@
                     <!-- Right: track count + amazon -->
                     <div class="album-row-right">
                         <span class="album-row-tracks">
-                            <i data-lucide="music" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;"></i>
+                            <i data-lucide="music"
+                                style="width:13px;height:13px;vertical-align:middle;margin-right:4px;"></i>
                             {{ album.songs.length }}
                         </span>
                         <a :href="getAmazonLink(album.songs[0] ? album.songs[0].artist : 'サザンオールスターズ', album.title)"
-                            target="_blank" rel="noopener noreferrer"
-                            class="album-row-amazon" @click.stop title="Amazonで購入">
+                            target="_blank" rel="noopener noreferrer" class="album-row-amazon" @click.stop
+                            title="Amazonで購入">
                             <i data-lucide="shopping-cart"></i>
                         </a>
                         <i data-lucide="chevron-right" class="album-row-chevron"></i>
@@ -256,14 +255,14 @@
                     <i data-lucide="heart"
                         style="width:64px; height:64px; opacity:0.25; margin-bottom:20px; display:block;"></i>
                     <p style="font-size:1.1rem; font-weight:700;">お気に入りはまだありません</p>
-                    <p style="font-size:0.9rem; margin-top:8px; color:var(--text-secondary);">曲カードの ♥ ボタン、または曲詳細からお気に入りを追加できます</p>
+                    <p style="font-size:0.9rem; margin-top:8px; color:var(--text-secondary);">曲カードの ♥
+                        ボタン、または曲詳細からお気に入りを追加できます</p>
                 </div>
                 <div v-else class="song-grid" style="padding-top:0;">
                     <div v-for="song in favoriteSongs" :key="song.id" class="song-card" @click="openSong(song)">
                         <div class="card-top-row">
                             <div class="year">{{ song.release_year }}</div>
-                            <button class="fav-btn active" @click.stop="toggleFavorite(song.id)"
-                                title="お気に入りから削除">
+                            <button class="fav-btn active" @click.stop="toggleFavorite(song.id)" title="お気に入りから削除">
                                 <i data-lucide="heart"></i>
                             </button>
                         </div>
@@ -281,8 +280,8 @@
 
             <div v-if="viewMode === 'songs' && filteredSongs.length > displayLimit"
                 style="text-align: center; padding: 40px;">
-                <button class="tag" @click="displayLimit += 48"
-                    style="padding: 12px 40px; font-size: 1rem;">Load More</button>
+                <button class="tag" @click="displayLimit += 48" style="padding: 12px 40px; font-size: 1rem;">Load
+                    More</button>
             </div>
         </main>
 
@@ -290,9 +289,17 @@
             <div class="footer-content">
                 <p>※ このサイトはサザンオールスターズのファンが個人的に制作したデータベースです。<br>
                     楽曲・歌詞の著作権はサザンオールスターズ、桑田佳祐、および各権利者に帰属します。</p>
+
+                <div class="footer-contact">
+                    <a href="mailto:info@sasfans.com">
+                        <i data-lucide="mail"></i>
+                        お問い合わせ: info@sasfans.com
+                    </a>
+                </div>
+
                 <div class="footer-bottom">
-                    <span
-                        style="opacity:0.4; font-size:0.7rem; letter-spacing:0.05em;">/ 検索&nbsp;·&nbsp;R ランダム&nbsp;·&nbsp;← → ナビ&nbsp;·&nbsp;F お気に入り&nbsp;·&nbsp;Esc 閉じる</span><br>
+                    <span style="opacity:0.4; font-size:0.7rem; letter-spacing:0.05em;">/ 検索&nbsp;·&nbsp;R
+                        ランダム&nbsp;·&nbsp;← → ナビ&nbsp;·&nbsp;F お気に入り&nbsp;·&nbsp;Esc 閉じる</span><br>
                     &copy; 2026 SAS ARCHIVE PROJECT
                 </div>
             </div>
@@ -318,11 +325,9 @@
                     </div>
 
                     <div style="text-align: center; padding: 0 16px;">
-                        <div class="year"
-                            style="color: var(--accent-blue); font-weight: 700; margin-bottom: 8px;">{{
+                        <div class="year" style="color: var(--accent-blue); font-weight: 700; margin-bottom: 8px;">{{
                             currentSong.release_year }}</div>
-                        <h2
-                            style="font-size: 2.2rem; font-weight: 900; margin-bottom: 8px; line-height: 1.2;">
+                        <h2 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 8px; line-height: 1.2;">
                             {{ currentSong.title }}</h2>
                         <div style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 20px;">
                             {{ currentSong.artist }}</div>
@@ -393,7 +398,8 @@
                                 <div class="included-album-meta">
                                     <span class="album-cat-badge" :class="'badge-' + album.category.toLowerCase()"
                                         style="font-size:0.65rem; padding:1px 6px;">{{ album.category }}</span>
-                                    <span style="color:var(--text-secondary); font-size:0.8rem; margin-left:6px;">{{ album.date }}</span>
+                                    <span style="color:var(--text-secondary); font-size:0.8rem; margin-left:6px;">{{
+                                        album.date }}</span>
                                 </div>
                             </div>
                             <div style="color: var(--accent-orange); flex-shrink:0;">
@@ -439,9 +445,11 @@
                             </span>
                             <h2 class="album-modal-title">{{ currentAlbum.title }}</h2>
                             <div style="color: var(--text-secondary); font-size:0.95rem; margin-top:6px;">
-                                {{ currentAlbum.songs[0] ? currentAlbum.songs[0].artist_group || currentAlbum.songs[0].artist : '' }}
+                                {{ currentAlbum.songs[0] ? currentAlbum.songs[0].artist_group ||
+                                currentAlbum.songs[0].artist : '' }}
                             </div>
-                            <div style="color: var(--text-secondary); font-size:0.9rem; margin-top:4px;">{{ currentAlbum.date }}</div>
+                            <div style="color: var(--text-secondary); font-size:0.9rem; margin-top:4px;">{{
+                                currentAlbum.date }}</div>
                             <a :href="getAmazonLink(currentAlbum.songs[0] ? currentAlbum.songs[0].artist : 'サザンオールスターズ', currentAlbum.title)"
                                 target="_blank" rel="noopener noreferrer" class="amazon-cta-btn"
                                 style="display: inline-flex; margin-top: 16px; font-size:0.9rem; padding: 10px 22px;">
@@ -450,19 +458,17 @@
                         </div>
                     </div>
 
-                    <div
-                        style="margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--border-color);">
+                    <div style="margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--border-color);">
                         <div
                             style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
                             <h3>収録曲 ({{ currentAlbum.songs.length }} Tracks)</h3>
-                            <button class="clear-btn"
-                                @click="filterByAlbum(currentAlbum.title); currentAlbum = null;">
+                            <button class="clear-btn" @click="filterByAlbum(currentAlbum.title); currentAlbum = null;">
                                 <i data-lucide="filter"></i> 収録曲だけ見る
                             </button>
                         </div>
                         <div class="album-tracklist">
-                            <div v-for="(song, idx) in currentAlbum.songs" :key="song.id"
-                                class="tracklist-item" @click="openSong(song); currentAlbum = null;">
+                            <div v-for="(song, idx) in currentAlbum.songs" :key="song.id" class="tracklist-item"
+                                @click="openSong(song); currentAlbum = null;">
                                 <div class="track-number">{{ idx + 1 }}</div>
                                 <div class="track-info">
                                     <div class="track-title">{{ song.title }}</div>
@@ -891,14 +897,43 @@
     </script>
 
     <style>
-        [v-cloak] { display: none; }
-        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
-        .fade-enter-from, .fade-leave-to { opacity: 0; }
-        .toast-enter-active, .toast-leave-active { transition: all 0.3s ease; }
-        .toast-enter-from, .toast-leave-to { opacity: 0; transform: translateX(-50%) translateY(16px); }
-        .modal-content::-webkit-scrollbar { width: 8px; }
-        .modal-content::-webkit-scrollbar-track { background: transparent; }
-        .modal-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        [v-cloak] {
+            display: none;
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 0.3s;
+        }
+
+        .fade-enter-from,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        .toast-enter-active,
+        .toast-leave-active {
+            transition: all 0.3s ease;
+        }
+
+        .toast-enter-from,
+        .toast-leave-to {
+            opacity: 0;
+            transform: translateX(-50%) translateY(16px);
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
     </style>
 </body>
 

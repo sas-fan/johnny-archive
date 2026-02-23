@@ -642,6 +642,33 @@ footer {
     line-height: 1.8;
 }
 
+.footer-contact {
+    margin-top: 24px;
+}
+
+.footer-contact a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(56, 189, 248, 0.05);
+}
+
+.footer-contact a:hover {
+    background: rgba(56, 189, 248, 0.15);
+    transform: translateY(-2px);
+}
+
+.footer-contact i {
+    width: 16px;
+    height: 16px;
+}
+
 .footer-bottom {
     margin-top: 32px;
     font-size: 0.75rem;
@@ -660,14 +687,17 @@ footer {
     align-items: flex-start;
     margin-bottom: 8px;
 }
-.card-top-row .year { margin-bottom: 0; }
+
+.card-top-row .year {
+    margin-bottom: 0;
+}
 
 /* ----- Favorite button (on cards) ----- */
 .fav-btn {
     background: transparent;
     border: none;
     cursor: pointer;
-    color: rgba(255,255,255,0.2);
+    color: rgba(255, 255, 255, 0.2);
     padding: 4px;
     display: flex;
     align-items: center;
@@ -678,10 +708,25 @@ footer {
     transition: all 0.2s;
     flex-shrink: 0;
 }
-.fav-btn i { width: 16px; height: 16px; }
-.fav-btn:hover { color: var(--accent-pink); background: rgba(244,114,182,0.1); }
-.fav-btn.active { color: var(--accent-pink); }
-.fav-btn.active i { fill: var(--accent-pink); stroke: var(--accent-pink); }
+
+.fav-btn i {
+    width: 16px;
+    height: 16px;
+}
+
+.fav-btn:hover {
+    color: var(--accent-pink);
+    background: rgba(244, 114, 182, 0.1);
+}
+
+.fav-btn.active {
+    color: var(--accent-pink);
+}
+
+.fav-btn.active i {
+    fill: var(--accent-pink);
+    stroke: var(--accent-pink);
+}
 
 /* ----- Favorite button (in modal) ----- */
 .modal-fav-btn {
@@ -699,15 +744,28 @@ footer {
     transition: all 0.2s;
     margin-top: 12px;
 }
-.modal-fav-btn i { width: 18px; height: 18px; }
-.modal-fav-btn:hover { border-color: var(--accent-pink); color: var(--accent-pink); }
+
+.modal-fav-btn i {
+    width: 18px;
+    height: 18px;
+}
+
+.modal-fav-btn:hover {
+    border-color: var(--accent-pink);
+    color: var(--accent-pink);
+}
+
 .modal-fav-btn.active {
-    background: rgba(244,114,182,0.15);
+    background: rgba(244, 114, 182, 0.15);
     border-color: var(--accent-pink);
     color: var(--accent-pink);
     font-weight: 600;
 }
-.modal-fav-btn.active i { fill: var(--accent-pink); stroke: var(--accent-pink); }
+
+.modal-fav-btn.active i {
+    fill: var(--accent-pink);
+    stroke: var(--accent-pink);
+}
 
 /* ----- Modal top bar: [←] [×] [→] in one flex row ----- */
 .modal-top-bar {
@@ -719,7 +777,7 @@ footer {
 
 /* Prev / Next buttons */
 .modal-nav {
-    background: rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--border-color);
     color: white;
     width: 40px;
@@ -732,12 +790,20 @@ footer {
     transition: all 0.2s;
     flex-shrink: 0;
 }
-.modal-nav:hover { background: rgba(255,255,255,0.18); border-color: var(--accent-blue); }
-.modal-nav i { width: 20px; height: 20px; }
+
+.modal-nav:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: var(--accent-blue);
+}
+
+.modal-nav i {
+    width: 20px;
+    height: 20px;
+}
 
 /* Inline close button inside top bar */
 .modal-close-inline {
-    background: rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--border-color);
     color: white;
     width: 40px;
@@ -750,12 +816,17 @@ footer {
     transition: all 0.2s;
     flex-shrink: 0;
 }
+
 .modal-close-inline:hover {
-    background: rgba(239,68,68,0.2);
-    border-color: rgba(239,68,68,0.5);
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
     color: #fca5a5;
 }
-.modal-close-inline i { width: 18px; height: 18px; }
+
+.modal-close-inline i {
+    width: 18px;
+    height: 18px;
+}
 
 /* ----- Amazon CTA block (song modal) ----- */
 .amazon-cta {
@@ -763,6 +834,7 @@ footer {
     justify-content: center;
     margin: 28px 0 0;
 }
+
 .amazon-cta-btn {
     display: inline-flex;
     align-items: center;
@@ -775,13 +847,18 @@ footer {
     border-radius: 100px;
     text-decoration: none;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(255,153,0,0.35);
+    box-shadow: 0 4px 20px rgba(255, 153, 0, 0.35);
 }
+
 .amazon-cta-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(255,153,0,0.5);
+    box-shadow: 0 8px 30px rgba(255, 153, 0, 0.5);
 }
-.amazon-cta-btn i { width: 20px; height: 20px; }
+
+.amazon-cta-btn i {
+    width: 20px;
+    height: 20px;
+}
 
 /* ----- Similar Songs section ----- */
 .similar-songs {
@@ -789,38 +866,62 @@ footer {
     padding-top: 40px;
     border-top: 1px solid var(--border-color);
 }
+
 .similar-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
 }
+
 .similar-card {
-    background: rgba(255,255,255,0.04);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 16px;
     cursor: pointer;
     transition: all 0.2s;
 }
+
 .similar-card:hover {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     border-color: var(--accent-blue);
     transform: translateY(-2px);
 }
-.similar-year { font-size: 0.7rem; color: var(--accent-blue); font-weight: 700; margin-bottom: 4px; }
-.similar-title { font-size: 0.95rem; font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
-.similar-artist { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 6px; }
+
+.similar-year {
+    font-size: 0.7rem;
+    color: var(--accent-blue);
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.similar-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.similar-artist {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
 .similar-mood {
     font-size: 0.7rem;
     padding: 2px 8px;
     border-radius: 4px;
-    background: rgba(251,146,60,0.2);
+    background: rgba(251, 146, 60, 0.2);
     color: var(--accent-orange);
     display: inline-block;
 }
 
 /* ----- FAVORITES tab ----- */
-.favorites-tab { position: relative; }
+.favorites-tab {
+    position: relative;
+}
+
 .fav-count-badge {
     background: var(--accent-pink);
     color: #000;
@@ -844,7 +945,12 @@ footer {
 }
 
 /* ----- Album Tracklist (album detail modal) ----- */
-.album-tracklist { display: flex; flex-direction: column; gap: 4px; }
+.album-tracklist {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .tracklist-item {
     display: flex;
     align-items: center;
@@ -855,11 +961,38 @@ footer {
     transition: all 0.2s;
     border: 1px solid transparent;
 }
-.tracklist-item:hover { background: rgba(255,255,255,0.06); border-color: var(--border-color); }
-.track-number { font-size: 0.8rem; color: var(--text-secondary); width: 24px; text-align: right; flex-shrink: 0; }
-.track-info { flex: 1; min-width: 0; }
-.track-title { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.track-artist { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+
+.tracklist-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--border-color);
+}
+
+.track-number {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    width: 24px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.track-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.track-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track-artist {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
 
 /* ----- Album thumb (in song modal "Included in") ----- */
 .album-thumb {
@@ -870,6 +1003,7 @@ footer {
     background-position: center;
     flex-shrink: 0;
 }
+
 .album-icon-small {
     width: 60px;
     height: 60px;
@@ -896,11 +1030,24 @@ footer {
     transition: all 0.2s;
     flex-shrink: 0;
 }
-.icon-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
-.icon-btn i { width: 18px; height: 18px; }
+
+.icon-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+.icon-btn i {
+    width: 18px;
+    height: 18px;
+}
 
 /* ----- Keyboard shortcut modal ----- */
-.shortcut-list { display: flex; flex-direction: column; gap: 20px; }
+.shortcut-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 .shortcut-item {
     display: flex;
     align-items: center;
@@ -908,18 +1055,28 @@ footer {
     font-size: 0.95rem;
     color: var(--text-secondary);
 }
-.shortcut-keys { display: flex; gap: 6px; flex-shrink: 0; min-width: 80px; }
-.shortcut-item span { color: var(--text-primary); }
+
+.shortcut-keys {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+    min-width: 80px;
+}
+
+.shortcut-item span {
+    color: var(--text-primary);
+}
+
 kbd {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
     padding: 4px 10px;
     font-size: 0.82rem;
     font-family: monospace;
     color: var(--text-primary);
     white-space: nowrap;
-    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* ----- Toast notification ----- */
@@ -928,7 +1085,7 @@ kbd {
     bottom: 32px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(20,27,45,0.96);
+    background: rgba(20, 27, 45, 0.96);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     padding: 12px 28px;
@@ -936,7 +1093,7 @@ kbd {
     font-size: 0.9rem;
     z-index: 9999;
     backdrop-filter: blur(16px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     white-space: nowrap;
 }
 
@@ -945,9 +1102,20 @@ kbd {
    ============================================ */
 
 /* Category color variables */
-.badge-album,  .cat-album  { --cat-color: var(--accent-blue); }
-.badge-single, .cat-single { --cat-color: var(--accent-orange); }
-.badge-digital,.cat-digital { --cat-color: var(--accent-pink); }
+.badge-album,
+.cat-album {
+    --cat-color: var(--accent-blue);
+}
+
+.badge-single,
+.cat-single {
+    --cat-color: var(--accent-orange);
+}
+
+.badge-digital,
+.cat-digital {
+    --cat-color: var(--accent-pink);
+}
 
 /* Category pill badge */
 .album-cat-badge {
@@ -961,11 +1129,23 @@ kbd {
     text-transform: uppercase;
     border: 1px solid var(--cat-color, var(--accent-blue));
     color: var(--cat-color, var(--accent-blue));
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
 }
-.badge-album   { border-color: var(--accent-blue);   color: var(--accent-blue); }
-.badge-single  { border-color: var(--accent-orange);  color: var(--accent-orange); }
-.badge-digital { border-color: var(--accent-pink);    color: var(--accent-pink); }
+
+.badge-album {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+.badge-single {
+    border-color: var(--accent-orange);
+    color: var(--accent-orange);
+}
+
+.badge-digital {
+    border-color: var(--accent-pink);
+    color: var(--accent-pink);
+}
 
 /* List container */
 .album-list-view {
@@ -985,15 +1165,25 @@ kbd {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.23,1,0.32,1);
+    transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
 }
-.album-row.cat-album  { border-left: 3px solid var(--accent-blue); }
-.album-row.cat-single { border-left: 3px solid var(--accent-orange); }
-.album-row.cat-digital{ border-left: 3px solid var(--accent-pink); }
+
+.album-row.cat-album {
+    border-left: 3px solid var(--accent-blue);
+}
+
+.album-row.cat-single {
+    border-left: 3px solid var(--accent-orange);
+}
+
+.album-row.cat-digital {
+    border-left: 3px solid var(--accent-pink);
+}
+
 .album-row:hover {
     background: var(--card-hover);
     transform: translateX(4px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 /* Left: badge + year */
@@ -1005,6 +1195,7 @@ kbd {
     flex-shrink: 0;
     width: 76px;
 }
+
 .album-row-year {
     font-size: 0.75rem;
     color: var(--text-secondary);
@@ -1012,7 +1203,11 @@ kbd {
 }
 
 /* Center */
-.album-row-center { flex: 1; min-width: 0; }
+.album-row-center {
+    flex: 1;
+    min-width: 0;
+}
+
 .album-row-title {
     font-size: 1rem;
     font-weight: 700;
@@ -1022,6 +1217,7 @@ kbd {
     text-overflow: ellipsis;
     color: var(--text-primary);
 }
+
 .album-row-meta {
     font-size: 0.8rem;
     color: var(--text-secondary);
@@ -1038,6 +1234,7 @@ kbd {
     gap: 12px;
     flex-shrink: 0;
 }
+
 .album-row-tracks {
     font-size: 0.8rem;
     color: var(--text-secondary);
@@ -1046,6 +1243,7 @@ kbd {
     display: flex;
     align-items: center;
 }
+
 .album-row-amazon {
     display: flex;
     align-items: center;
@@ -1053,15 +1251,23 @@ kbd {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: rgba(255,153,0,0.1);
-    border: 1px solid rgba(255,153,0,0.3);
+    background: rgba(255, 153, 0, 0.1);
+    border: 1px solid rgba(255, 153, 0, 0.3);
     color: #ff9900;
     text-decoration: none;
     transition: all 0.2s;
     flex-shrink: 0;
 }
-.album-row-amazon:hover { background: rgba(255,153,0,0.28); }
-.album-row-amazon i { width: 14px; height: 14px; }
+
+.album-row-amazon:hover {
+    background: rgba(255, 153, 0, 0.28);
+}
+
+.album-row-amazon i {
+    width: 14px;
+    height: 14px;
+}
+
 .album-row-chevron {
     width: 16px;
     height: 16px;
@@ -1077,6 +1283,7 @@ kbd {
     align-items: flex-start;
     margin-bottom: 32px;
 }
+
 .album-modal-icon {
     width: 80px;
     height: 80px;
@@ -1086,12 +1293,41 @@ kbd {
     justify-content: center;
     flex-shrink: 0;
 }
-.album-modal-icon.badge-album   { background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.35); color: var(--accent-blue); }
-.album-modal-icon.badge-single  { background: rgba(251,146,60,0.12); border: 1px solid rgba(251,146,60,0.35); color: var(--accent-orange); }
-.album-modal-icon.badge-digital { background: rgba(244,114,182,0.12); border: 1px solid rgba(244,114,182,0.35); color: var(--accent-pink); }
-.album-modal-icon i { width: 36px; height: 36px; }
-.album-modal-info { flex: 1; min-width: 0; }
-.album-modal-title { font-size: 1.5rem; font-weight: 900; line-height: 1.3; margin: 6px 0 4px; }
+
+.album-modal-icon.badge-album {
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: var(--accent-blue);
+}
+
+.album-modal-icon.badge-single {
+    background: rgba(251, 146, 60, 0.12);
+    border: 1px solid rgba(251, 146, 60, 0.35);
+    color: var(--accent-orange);
+}
+
+.album-modal-icon.badge-digital {
+    background: rgba(244, 114, 182, 0.12);
+    border: 1px solid rgba(244, 114, 182, 0.35);
+    color: var(--accent-pink);
+}
+
+.album-modal-icon i {
+    width: 36px;
+    height: 36px;
+}
+
+.album-modal-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.album-modal-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    line-height: 1.3;
+    margin: 6px 0 4px;
+}
 
 /* ----- "Included in" rows in song modal ----- */
 .included-album-row {
@@ -1101,12 +1337,16 @@ kbd {
     padding: 12px 14px;
     border-radius: 12px;
     border: 1px solid var(--border-color);
-    background: rgba(255,255,255,0.03);
+    background: rgba(255, 255, 255, 0.03);
     text-decoration: none;
     transition: background 0.2s;
     margin-bottom: 10px;
 }
-.included-album-row:hover { background: rgba(255,255,255,0.08); }
+
+.included-album-row:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
 .included-album-icon {
     width: 40px;
     height: 40px;
@@ -1116,11 +1356,35 @@ kbd {
     justify-content: center;
     flex-shrink: 0;
 }
-.included-album-icon.badge-album   { background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); color: var(--accent-blue); }
-.included-album-icon.badge-single  { background: rgba(251,146,60,0.12); border: 1px solid rgba(251,146,60,0.3); color: var(--accent-orange); }
-.included-album-icon.badge-digital { background: rgba(244,114,182,0.12); border: 1px solid rgba(244,114,182,0.3); color: var(--accent-pink); }
-.included-album-icon i { width: 18px; height: 18px; }
-.included-album-text { flex: 1; min-width: 0; }
+
+.included-album-icon.badge-album {
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: var(--accent-blue);
+}
+
+.included-album-icon.badge-single {
+    background: rgba(251, 146, 60, 0.12);
+    border: 1px solid rgba(251, 146, 60, 0.3);
+    color: var(--accent-orange);
+}
+
+.included-album-icon.badge-digital {
+    background: rgba(244, 114, 182, 0.12);
+    border: 1px solid rgba(244, 114, 182, 0.3);
+    color: var(--accent-pink);
+}
+
+.included-album-icon i {
+    width: 18px;
+    height: 18px;
+}
+
+.included-album-text {
+    flex: 1;
+    min-width: 0;
+}
+
 .included-album-title {
     font-weight: 700;
     font-size: 0.95rem;
@@ -1129,7 +1393,12 @@ kbd {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.included-album-meta { display: flex; align-items: center; margin-top: 4px; }
+
+.included-album-meta {
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+}
 
 /* ============================================
    Animations
@@ -1234,25 +1503,30 @@ kbd {
         gap: 8px;
         padding: 8px 16px 4px;
     }
+
     .view-tab {
-        flex: 1;                  /* 均等幅 */
+        flex: 1;
+        /* 均等幅 */
         padding: 10px 8px;
         font-size: 0.78rem;
         gap: 5px;
         justify-content: center;
         min-width: 0;
     }
+
     .view-tab i {
         width: 15px;
         height: 15px;
         flex-shrink: 0;
     }
+
     /* FAVORITESのバッジが溢れないよう */
     .fav-count-badge {
         font-size: 0.6rem;
         padding: 1px 4px;
         margin-left: 3px;
     }
+
     /* タブのラベルテキストを短縮 */
     .tab-label {
         overflow: hidden;
@@ -1275,7 +1549,12 @@ kbd {
         gap: 10px;
         width: 100%;
     }
-    .filter-row { width: 100%; min-width: 0; }
+
+    .filter-row {
+        width: 100%;
+        min-width: 0;
+    }
+
     .filter-group {
         flex-direction: column;
         align-items: flex-start;
@@ -1283,6 +1562,7 @@ kbd {
         width: 100%;
         min-width: 0;
     }
+
     .filter-label {
         font-size: 0.68rem;
         min-width: unset;
@@ -1291,6 +1571,7 @@ kbd {
         opacity: 0.9;
         padding-top: 0;
     }
+
     .tag-scroll {
         display: flex;
         flex-direction: row;
@@ -1303,7 +1584,11 @@ kbd {
         -webkit-overflow-scrolling: touch;
         scroll-snap-type: x proximity;
     }
-    .tag-scroll::-webkit-scrollbar { display: none; }
+
+    .tag-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
     .tag {
         flex: 0 0 auto;
         scroll-snap-align: start;
@@ -1312,50 +1597,149 @@ kbd {
     }
 
     /* ===== Active album banner ===== */
-    .active-album-banner { margin: 0 16px 16px; }
+    .active-album-banner {
+        margin: 0 16px 16px;
+    }
 
     /* ===== Song cards ===== */
-    .song-card { padding: 18px; }
-    .song-card .title { font-size: 1.1rem; }
+    .song-card {
+        padding: 18px;
+    }
+
+    .song-card .title {
+        font-size: 1.1rem;
+    }
 
     /* ===== Album list view ===== */
-    .album-list-view { padding: 0 16px 20px; gap: 5px; }
-    .album-row { gap: 10px; padding: 12px 14px; }
-    .album-row-left { width: 56px; gap: 4px; }
-    .album-row-year { font-size: 0.7rem; }
-    .album-row-title { font-size: 0.9rem; }
-    .album-row-meta { font-size: 0.75rem; }
-    .album-row-amazon { display: none; }   /* スペース節約 */
-    .album-row-chevron { display: block; } /* → は残す */
+    .album-list-view {
+        padding: 0 16px 20px;
+        gap: 5px;
+    }
+
+    .album-row {
+        gap: 10px;
+        padding: 12px 14px;
+    }
+
+    .album-row-left {
+        width: 56px;
+        gap: 4px;
+    }
+
+    .album-row-year {
+        font-size: 0.7rem;
+    }
+
+    .album-row-title {
+        font-size: 0.9rem;
+    }
+
+    .album-row-meta {
+        font-size: 0.75rem;
+    }
+
+    .album-row-amazon {
+        display: none;
+    }
+
+    /* スペース節約 */
+    .album-row-chevron {
+        display: block;
+    }
+
+    /* → は残す */
 
     /* ===== Album modal ===== */
-    .album-modal-header { flex-direction: column; gap: 12px; }
-    .album-modal-icon { width: 56px; height: 56px; }
-    .album-modal-icon i { width: 26px; height: 26px; }
-    .album-modal-title { font-size: 1.2rem; }
+    .album-modal-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .album-modal-icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .album-modal-icon i {
+        width: 26px;
+        height: 26px;
+    }
+
+    .album-modal-title {
+        font-size: 1.2rem;
+    }
 
     /* ===== Modals ===== */
-    .modal-overlay { padding: 8px; }
-    .modal-content { padding: 20px 14px; border-radius: 20px; }
-    .modal-top-bar { margin-bottom: 16px; }
-    .modal-nav { width: 36px; height: 36px; }
-    .modal-close-inline { width: 36px; height: 36px; }
+    .modal-overlay {
+        padding: 8px;
+    }
+
+    .modal-content {
+        padding: 20px 14px;
+        border-radius: 20px;
+    }
+
+    .modal-top-bar {
+        margin-bottom: 16px;
+    }
+
+    .modal-nav {
+        width: 36px;
+        height: 36px;
+    }
+
+    .modal-close-inline {
+        width: 36px;
+        height: 36px;
+    }
 
     /* ===== Song modal body ===== */
-    .modal-content h2 { font-size: 1.6rem !important; }
-    .amazon-cta { margin: 20px 0 0; }
-    .amazon-cta-btn { font-size: 0.88rem; padding: 11px 20px; }
-    .external-links { gap: 10px; margin-top: 20px; }
-    .link-btn { padding: 10px 16px; font-size: 0.85rem; }
+    .modal-content h2 {
+        font-size: 1.6rem !important;
+    }
+
+    .amazon-cta {
+        margin: 20px 0 0;
+    }
+
+    .amazon-cta-btn {
+        font-size: 0.88rem;
+        padding: 11px 20px;
+    }
+
+    .external-links {
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .link-btn {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+    }
 
     /* ===== Similar songs ===== */
-    .similar-grid { grid-template-columns: 1fr; }
-    .similar-songs { margin-top: 28px; padding-top: 28px; }
+    .similar-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .similar-songs {
+        margin-top: 28px;
+        padding-top: 28px;
+    }
 
     /* ===== Keyboard shortcut modal ===== */
-    .shortcut-keys { min-width: 56px; }
-    .icon-btn { width: 36px; height: 36px; }
+    .shortcut-keys {
+        min-width: 56px;
+    }
+
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+    }
 
     /* ===== Footer ===== */
-    footer { padding: 40px 16px; margin-top: 40px; }
+    footer {
+        padding: 40px 16px;
+        margin-top: 40px;
+    }
 }

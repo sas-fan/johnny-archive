@@ -111,20 +111,29 @@ header {
 
 .controls {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px 32px;
     padding: 20px 40px;
     margin-bottom: 10px;
 }
 
 .filter-row {
-    width: 100%;
+    flex: 1 1 100%;
+    /* Stacks the categories vertically, but keeps internal items horizontal */
+    min-width: 0;
+}
+
+.filter-row.bottom-row {
+    flex: 1 1 100%;
 }
 
 .filter-group {
     display: flex;
+    flex-direction: row;
+    /* Horizontal for PC */
     align-items: flex-start;
-    gap: 12px;
+    gap: 16px;
 }
 
 .tag-scroll {
@@ -141,7 +150,8 @@ header {
     text-transform: uppercase;
     letter-spacing: 0.1em;
     min-width: 80px;
-    padding-top: 6px;
+    padding-top: 8px;
+    /* Alignment with tags */
 }
 
 .tag {
@@ -321,17 +331,62 @@ header {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
+.album-image-link {
+    display: block;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s;
+}
+
+.album-image-link:hover {
+    transform: translateY(-4px);
+}
+
+.album-cover {
+    width: 200px;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.amazon-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    color: var(--accent-orange);
+}
+
+.amazon-overlay i {
+    width: 40px;
+    height: 40px;
+}
+
+.album-image-link:hover .amazon-overlay {
+    opacity: 1;
+}
+
 .album-icon {
-    width: 80px;
-    height: 80px;
+    width: 200px;
+    height: 200px;
     background: linear-gradient(135deg, var(--accent-blue), var(--accent-orange));
-    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     color: #fff;
-    margin-bottom: 20px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
 }
 
 .album-title {
@@ -621,13 +676,39 @@ footer {
     header {
         flex-direction: column;
         height: auto;
-        padding: 16px 20px;
-        gap: 16px;
+        padding: 12px 16px;
+        gap: 8px;
+    }
+
+    .logo {
+        font-size: 1.1rem;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .subtitle {
+        font-size: 0.55rem;
+        display: block;
+        opacity: 0.8;
     }
 
     .header-right {
         width: 100%;
-        justify-content: space-between;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .stats,
+    .random-btn span {
+        display: none;
+        /* Hide stats and text on mobile */
+    }
+
+    .random-btn {
+        padding: 8px;
+        width: 40px;
+        height: 40px;
+        justify-content: center;
     }
 
     .logo-area {
@@ -640,7 +721,8 @@ footer {
     }
 
     body {
-        padding-top: 190px;
+        padding-top: 135px;
+        /* Precision adjustment */
     }
 
     .song-grid {
@@ -648,21 +730,34 @@ footer {
     }
 
     .controls {
+        flex-direction: column;
+        flex-wrap: nowrap;
         padding: 20px;
+        gap: 12px;
+    }
+
+    .filter-row {
+        flex: 1 1 auto;
+    }
+
+    .filter-group {
+        flex-direction: column;
+        /* Vertical for mobile only */
+        gap: 8px;
     }
 
     .filter-label {
-        min-width: 60px;
         font-size: 0.7rem;
-        padding-top: 8px;
+        min-width: unset;
+        font-weight: 700;
     }
 
     .tag-scroll {
         flex-wrap: nowrap;
-        /* Horizontal scroll only for mobile */
         overflow-x: auto;
         padding-bottom: 8px;
         -webkit-overflow-scrolling: touch;
+        width: 100%;
     }
 
     .tag-scroll::-webkit-scrollbar {

@@ -21,12 +21,13 @@
 body {
     background: var(--bg-color);
     background-image:
-        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(251, 146, 60, 0.1) 0, transparent 50%);
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(251, 146, 60, 0.05) 0, transparent 50%);
     color: var(--text-primary);
     min-height: 100vh;
     padding-top: 100px;
     overflow-x: hidden;
+    width: 100%;
 }
 
 header {
@@ -675,44 +676,33 @@ footer {
 
 @media (max-width: 768px) {
     header {
-        /* 2行構成: 上段=ロゴ, 下段=検索+ボタン */
         flex-direction: column;
         height: auto;
-        padding: 8px 14px;
-        gap: 8px;
+        padding: 10px 16px;
+        gap: 10px;
         align-items: stretch;
     }
 
     .logo-area {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 6px;
         width: 100%;
+        gap: 2px;
     }
 
     .logo {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         justify-content: center;
+        width: 100%;
     }
 
     .subtitle {
         font-size: 0.6rem;
         opacity: 0.8;
         margin-top: 0;
-        /* サブタイトルはロゴの隣に横並びにする */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 200px;
-    }
-
-    /* 下段: 検索バー + ランダムボタンを横一列に */
-    .search-container {
-        flex: 1;
-        margin: 0;
-        min-width: 0;
+        text-align: center;
     }
 
     .header-right {
@@ -723,11 +713,12 @@ footer {
         width: 100%;
     }
 
-    /* 検索バーが header-right 内で伸びるように */
     .header-right .search-container {
         flex: 1;
         margin: 0;
         max-width: none;
+        min-width: 0;
+        /* Important for flex child */
     }
 
     .stats {
@@ -740,71 +731,82 @@ footer {
 
     .random-btn {
         padding: 0;
-        width: 40px;
-        height: 40px;
+        width: 42px;
+        height: 42px;
         justify-content: center;
         flex-shrink: 0;
     }
 
-    /* Dynamic padding handled by JS - fallback value */
     body {
-        padding-top: 110px;
+        padding-top: 130px;
     }
 
     .song-grid {
         grid-template-columns: 1fr;
-        padding: 0 12px 20px;
-        gap: 12px;
+        padding: 0 16px 20px;
+        gap: 16px;
     }
 
     .album-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        padding: 0 12px 20px;
-        gap: 12px;
-    }
-
-    .active-album-banner {
-        margin: 0 12px 12px;
-    }
-
-    .error-banner {
-        margin: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        padding: 0 16px 20px;
+        gap: 16px;
     }
 
     .controls {
         flex-direction: column;
-        flex-wrap: nowrap;
-        padding: 12px;
-        gap: 10px;
+        padding: 12px 16px;
+        gap: 12px;
+        width: 100%;
+        overflow-x: hidden;
     }
 
     .filter-row {
-        flex: 1 1 auto;
+        width: 100%;
+        min-width: 0;
+        /* 重要: 子のスクロールを可能にする */
     }
 
     .filter-group {
         flex-direction: column;
+        align-items: flex-start;
         gap: 6px;
+        width: 100%;
+        min-width: 0;
+        /* 重要 */
     }
 
     .filter-label {
-        font-size: 0.65rem;
+        font-size: 0.7rem;
         min-width: unset;
-        font-weight: 700;
-        letter-spacing: 0.1em;
+        font-weight: 800;
+        color: var(--accent-blue);
+        opacity: 0.9;
+        padding-top: 0;
     }
 
-    /* All tag rows (including sort) scroll horizontally on mobile */
     .tag-scroll {
+        display: flex;
+        flex-direction: row;
         flex-wrap: nowrap;
         overflow-x: auto;
-        padding-bottom: 6px;
-        -webkit-overflow-scrolling: touch;
+        overflow-y: hidden;
         width: 100%;
+        gap: 8px;
+        padding: 4px 0 12px;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
     }
 
     .tag-scroll::-webkit-scrollbar {
-        height: 0;
+        display: none;
+        /* スクロールバーを隠す */
+    }
+
+    .tag {
+        flex: 0 0 auto;
+        /* 勝手に縮まないように固定 */
+        scroll-snap-align: start;
     }
 
     .modal-overlay {
@@ -812,13 +814,7 @@ footer {
     }
 
     .modal-content {
-        padding: 20px;
+        padding: 24px 16px;
         border-radius: 20px;
-        max-height: 95vh;
-    }
-
-    .link-btn {
-        padding: 10px 16px;
-        font-size: 0.85rem;
     }
 }

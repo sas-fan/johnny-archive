@@ -9,7 +9,7 @@
     <meta property="og:title" content="SAS Song Archive & Database">
     <meta property="og:description" content="サザンオールスターズ＆関連アーティストの楽曲データベース">
     <meta property="og:type" content="website">
-    <link rel="stylesheet" href="style.css?v=2.0">
+    <link rel="stylesheet" href="style.css?v=3.0">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;700&display=swap"
         rel="stylesheet">
@@ -44,12 +44,16 @@
             </div>
             <div class="header-right">
                 <div class="search-container">
-                    <input type="text" v-model="searchQuery" class="search-input" placeholder="曲名、アーティスト、歌詞で検索...">
+                    <input type="text" v-model="searchQuery" ref="searchInputEl" class="search-input"
+                        placeholder="曲名、アーティスト、テーマで検索...">
                 </div>
-                <div class="stats">
+                <div class="stats" v-show="viewMode === 'songs'">
                     <strong>{{ filteredSongs.length }}</strong> Tracks
                 </div>
-                <button class="random-btn" @click="pickRandomSong" title="ランダム選曲">
+                <button class="icon-btn" @click="showShortcuts = true" title="キーボードショートカット (?)">
+                    <i data-lucide="keyboard"></i>
+                </button>
+                <button class="random-btn" @click="pickRandomSong" title="ランダム選曲 (R)">
                     <i data-lucide="shuffle"></i><span>RANDOM</span>
                 </button>
             </div>
@@ -57,10 +61,17 @@
 
         <main>
             <div class="view-tabs">
-                <button class="view-tab" :class="{ active: viewMode === 'songs' }" @click="viewMode = 'songs'"><i
-                        data-lucide="music"></i> SONGS</button>
-                <button class="view-tab" :class="{ active: viewMode === 'albums' }" @click="viewMode = 'albums'"><i
-                        data-lucide="disc"></i> ALBUMS</button>
+                <button class="view-tab" :class="{ active: viewMode === 'songs' }" @click="viewMode = 'songs'">
+                    <i data-lucide="music"></i> SONGS
+                </button>
+                <button class="view-tab" :class="{ active: viewMode === 'albums' }" @click="viewMode = 'albums'">
+                    <i data-lucide="disc"></i> ALBUMS
+                </button>
+                <button class="view-tab favorites-tab" :class="{ active: viewMode === 'favorites' }"
+                    @click="viewMode = 'favorites'">
+                    <i data-lucide="heart"></i> FAVORITES
+                    <span v-if="favoriteIds.length > 0" class="fav-count-badge">{{ favoriteIds.length }}</span>
+                </button>
             </div>
 
             <div v-if="errorMsg" class="error-banner">
@@ -68,21 +79,38 @@
             </div>
 
             <div v-if="viewMode === 'songs' && selectedAlbumFilter" class="active-album-banner">
-                <div style="display:flex; align-items:center; gap:8px;"><i data-lucide="disc"></i> 収録アルバム: <strong>{{
-                        selectedAlbumFilter }}</strong></div>
+                <div style="display:flex; align-items:center; gap:8px;"><i data-lucide="disc"></i> 収録アルバム:
+                    <strong>{{ selectedAlbumFilter }}</strong>
+                </div>
                 <button class="clear-btn" @click="clearAlbumFilter"><i data-lucide="x"></i> 絞り込み解除</button>
             </div>
 
+            <!-- ===== SONGS FILTERS ===== -->
             <div class="controls" v-show="viewMode === 'songs'">
                 <div class="filter-row">
                     <div class="filter-group">
                         <span class="filter-label">Artist</span>
                         <div class="tag-scroll">
-                            <div class="tag" :class="{ active: selectedArtist === '' }" @click="selectedArtist = ''">All
-                            </div>
+                            <div class="tag" :class="{ active: selectedArtist === '' }"
+                                @click="selectedArtist = ''">All</div>
                             <div v-for="artist in allArtists" :key="artist" class="tag"
                                 :class="{ active: selectedArtist === artist }" @click="selectedArtist = artist">
                                 {{ artist }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ★ Decade filter -->
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <span class="filter-label">Decade</span>
+                        <div class="tag-scroll">
+                            <div class="tag" :class="{ active: selectedDecade === '' }"
+                                @click="selectedDecade = ''">All</div>
+                            <div v-for="d in allDecades" :key="d.value" class="tag"
+                                :class="{ active: selectedDecade === d.value }" @click="selectedDecade = d.value">
+                                {{ d.label }}
                             </div>
                         </div>
                     </div>
@@ -106,8 +134,8 @@
                     <div class="filter-group">
                         <span class="filter-label">Mood</span>
                         <div class="tag-scroll">
-                            <div class="tag" :class="{ active: selectedMood === '' }" @click="selectedMood = ''">All
-                            </div>
+                            <div class="tag" :class="{ active: selectedMood === '' }"
+                                @click="selectedMood = ''">All</div>
                             <div v-for="mood in allMoods" :key="mood" class="tag"
                                 :class="{ active: selectedMood === mood }" @click="selectedMood = mood">
                                 {{ mood }}
@@ -120,19 +148,28 @@
                     <div class="filter-group">
                         <span class="filter-label">Sort</span>
                         <div class="tag-scroll">
-                            <div class="tag" :class="{ active: sortBy === 'year-desc' }" @click="sortBy = 'year-desc'">
-                                Newer</div>
-                            <div class="tag" :class="{ active: sortBy === 'year-asc' }" @click="sortBy = 'year-asc'">
-                                Older</div>
-                            <div class="tag" :class="{ active: sortBy === 'title' }" @click="sortBy = 'title'">A-Z</div>
+                            <div class="tag" :class="{ active: sortBy === 'year-desc' }"
+                                @click="sortBy = 'year-desc'">Newer</div>
+                            <div class="tag" :class="{ active: sortBy === 'year-asc' }"
+                                @click="sortBy = 'year-asc'">Older</div>
+                            <div class="tag" :class="{ active: sortBy === 'title' }"
+                                @click="sortBy = 'title'">A-Z</div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- ===== SONGS GRID ===== -->
             <div class="song-grid" v-show="viewMode === 'songs'">
                 <div v-for="song in slicedSongs" :key="song.id" class="song-card" @click="openSong(song)">
-                    <div class="year">{{ song.release_year }}</div>
+                    <div class="card-top-row">
+                        <div class="year">{{ song.release_year }}</div>
+                        <button class="fav-btn" :class="{ active: isFavorite(song.id) }"
+                            @click.stop="toggleFavorite(song.id)"
+                            :title="isFavorite(song.id) ? 'お気に入りから削除' : 'お気に入りに追加'">
+                            <i data-lucide="heart"></i>
+                        </button>
+                    </div>
                     <div class="title">{{ song.title }}</div>
                     <div class="artist">{{ song.artist }}</div>
                     <div class="themes">
@@ -144,7 +181,7 @@
                 </div>
             </div>
 
-            <!-- Album Filters -->
+            <!-- ===== ALBUMS FILTERS ===== -->
             <div class="controls" v-show="viewMode === 'albums'">
                 <div class="filter-row">
                     <div class="filter-group">
@@ -174,32 +211,78 @@
                 </div>
             </div>
 
-            <div v-if="viewMode === 'albums'" class="album-grid">
-                <div v-for="album in filteredAlbums" :key="album.title" class="album-card">
-                    <a :href="getAmazonLink(album.songs[0].artist, album.title)" target="_blank"
-                        rel="noopener noreferrer" class="album-image-link" title="Amazonで購入する">
-                        <div v-if="album.image" class="album-cover"
-                            :style="{ backgroundImage: 'url(' + album.image + ')' }">
-                            <div class="amazon-overlay"><i data-lucide="shopping-cart"></i></div>
+            <!-- ===== ALBUMS LIST ===== -->
+            <div v-if="viewMode === 'albums'" class="album-list-view">
+                <div v-for="album in filteredAlbums" :key="album.title"
+                    class="album-row" :class="'cat-' + album.category.toLowerCase()"
+                    @click="openAlbum(album)">
+
+                    <!-- Left: category accent bar + badges -->
+                    <div class="album-row-left">
+                        <span class="album-cat-badge" :class="'badge-' + album.category.toLowerCase()">
+                            {{ album.category }}
+                        </span>
+                        <span class="album-row-year">{{ album.date ? album.date.slice(0,4) : '—' }}</span>
+                    </div>
+
+                    <!-- Center: title + artist + date -->
+                    <div class="album-row-center">
+                        <div class="album-row-title">{{ album.title }}</div>
+                        <div class="album-row-meta">
+                            {{ album.songs[0] ? album.songs[0].artist_group || album.songs[0].artist : '' }}
+                            <span v-if="album.date" class="album-row-date">· {{ album.date }}</span>
                         </div>
-                        <div v-else class="album-icon"><i data-lucide="disc-3" style="width:40px; height:40px;"></i>
+                    </div>
+
+                    <!-- Right: track count + amazon -->
+                    <div class="album-row-right">
+                        <span class="album-row-tracks">
+                            <i data-lucide="music" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;"></i>
+                            {{ album.songs.length }}
+                        </span>
+                        <a :href="getAmazonLink(album.songs[0] ? album.songs[0].artist : 'サザンオールスターズ', album.title)"
+                            target="_blank" rel="noopener noreferrer"
+                            class="album-row-amazon" @click.stop title="Amazonで購入">
+                            <i data-lucide="shopping-cart"></i>
+                        </a>
+                        <i data-lucide="chevron-right" class="album-row-chevron"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== FAVORITES VIEW ===== -->
+            <div v-if="viewMode === 'favorites'">
+                <div v-if="favoriteIds.length === 0" class="empty-state">
+                    <i data-lucide="heart"
+                        style="width:64px; height:64px; opacity:0.25; margin-bottom:20px; display:block;"></i>
+                    <p style="font-size:1.1rem; font-weight:700;">お気に入りはまだありません</p>
+                    <p style="font-size:0.9rem; margin-top:8px; color:var(--text-secondary);">曲カードの ♥ ボタン、または曲詳細からお気に入りを追加できます</p>
+                </div>
+                <div v-else class="song-grid" style="padding-top:0;">
+                    <div v-for="song in favoriteSongs" :key="song.id" class="song-card" @click="openSong(song)">
+                        <div class="card-top-row">
+                            <div class="year">{{ song.release_year }}</div>
+                            <button class="fav-btn active" @click.stop="toggleFavorite(song.id)"
+                                title="お気に入りから削除">
+                                <i data-lucide="heart"></i>
+                            </button>
                         </div>
-                    </a>
-                    <div class="album-info" @click="filterByAlbum(album.title)" title="このアルバムの曲を見る"
-                        style="cursor:pointer; width:100%; margin-top: 16px;">
-                        <div class="album-title">{{ album.title }}</div>
-                        <div class="album-date">{{ album.date }}</div>
-                        <div class="album-category">{{ album.category }}</div>
-                        <div class="album-tracks-badge">{{ album.songs.length }} Tracks <i data-lucide="chevron-right"
-                                style="width:14px; height:14px; vertical-align:middle; margin-left: 4px;"></i></div>
+                        <div class="title">{{ song.title }}</div>
+                        <div class="artist">{{ song.artist }}</div>
+                        <div class="themes">
+                            <span v-if="song.mood" class="theme-badge"
+                                style="background: rgba(251, 146, 60, 0.2); color: var(--accent-orange);">{{ song.mood
+                                }}</span>
+                            <span v-for="theme in song.themes" :key="theme" class="theme-badge">{{ theme }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div v-if="viewMode === 'songs' && filteredSongs.length > displayLimit"
                 style="text-align: center; padding: 40px;">
-                <button class="tag" @click="displayLimit += 48" style="padding: 12px 40px; font-size: 1rem;">Load
-                    More</button>
+                <button class="tag" @click="displayLimit += 48"
+                    style="padding: 12px 40px; font-size: 1rem;">Load More</button>
             </div>
         </main>
 
@@ -208,26 +291,51 @@
                 <p>※ このサイトはサザンオールスターズのファンが個人的に制作したデータベースです。<br>
                     楽曲・歌詞の著作権はサザンオールスターズ、桑田佳祐、および各権利者に帰属します。</p>
                 <div class="footer-bottom">
+                    <span
+                        style="opacity:0.4; font-size:0.7rem; letter-spacing:0.05em;">/ 検索&nbsp;·&nbsp;R ランダム&nbsp;·&nbsp;← → ナビ&nbsp;·&nbsp;F お気に入り&nbsp;·&nbsp;Esc 閉じる</span><br>
                     &copy; 2026 SAS ARCHIVE PROJECT
                 </div>
             </div>
         </footer>
 
-        <!-- Song Modal -->
+        <!-- ============================= -->
+        <!-- SONG MODAL                    -->
+        <!-- ============================= -->
         <transition name="fade">
             <div v-if="currentSong" class="modal-overlay" @click.self="currentSong = null">
                 <div class="modal-content">
-                    <button class="modal-close" @click="currentSong = null"><i data-lucide="x"></i></button>
+                    <!-- top bar: prev / close / next in one row -->
+                    <div class="modal-top-bar">
+                        <button class="modal-nav" @click="navigateSong(-1)" title="前の曲 (←)">
+                            <i data-lucide="chevron-left"></i>
+                        </button>
+                        <button class="modal-close-inline" @click="currentSong = null" title="閉じる (Esc)">
+                            <i data-lucide="x"></i>
+                        </button>
+                        <button class="modal-nav" @click="navigateSong(1)" title="次の曲 (→)">
+                            <i data-lucide="chevron-right"></i>
+                        </button>
+                    </div>
 
-                    <div style="text-align: center;">
-                        <div class="year" style="color: var(--accent-blue); font-weight: 700; margin-bottom: 8px;">{{
+                    <div style="text-align: center; padding: 0 16px;">
+                        <div class="year"
+                            style="color: var(--accent-blue); font-weight: 700; margin-bottom: 8px;">{{
                             currentSong.release_year }}</div>
-                        <h2 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 8px;">{{ currentSong.title }}
-                        </h2>
-                        <div style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 24px;">{{
-                            currentSong.artist }}</div>
+                        <h2
+                            style="font-size: 2.2rem; font-weight: 900; margin-bottom: 8px; line-height: 1.2;">
+                            {{ currentSong.title }}</h2>
+                        <div style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 20px;">
+                            {{ currentSong.artist }}</div>
 
-                        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                        <!-- ★ Favorite button -->
+                        <button class="modal-fav-btn" :class="{ active: isFavorite(currentSong.id) }"
+                            @click="toggleFavorite(currentSong.id)" title="お気に入りトグル (F)">
+                            <i data-lucide="heart"></i>
+                            {{ isFavorite(currentSong.id) ? 'お気に入り済み' : 'お気に入りに追加' }}
+                        </button>
+
+                        <div
+                            style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px;">
                             <span v-if="currentSong.mood" class="tag active"
                                 style="background: var(--accent-orange); border-color: var(--accent-orange); cursor: default; pointer-events: none;">{{
                                 currentSong.mood }}</span>
@@ -236,10 +344,19 @@
                         </div>
                     </div>
 
+                    <!-- ★ Amazon CD purchase CTA (prominent) -->
+                    <div class="amazon-cta">
+                        <a :href="getAmazonSongLink(currentSong)" target="_blank" rel="noopener noreferrer"
+                            class="amazon-cta-btn">
+                            <i data-lucide="shopping-cart"></i>
+                            CDで購入 (Amazon)
+                        </a>
+                    </div>
+
                     <div class="external-links">
                         <a :href="currentSong.links.lyrics" target="_blank" rel="noopener noreferrer"
                             class="link-btn lyrics-link">
-                            <i data-lucide="music-4"></i> 歌詞を検索 (Uta-Net)
+                            <i data-lucide="music-4"></i> 歌詞 (Uta-Net)
                         </a>
                         <a :href="currentSong.links.amazon" target="_blank" rel="noopener noreferrer"
                             class="link-btn amazon-link">
@@ -259,7 +376,7 @@
                         </a>
                         <a :href="currentSong.links.youtube" target="_blank" rel="noopener noreferrer"
                             class="link-btn youtube-link">
-                            <i data-lucide="youtube"></i> YouTube 検索
+                            <i data-lucide="youtube"></i> YouTube
                         </a>
                     </div>
 
@@ -267,124 +384,347 @@
                         <h3 style="margin-bottom: 20px;">Included in</h3>
                         <a v-for="album in currentSong.albums" :key="album.title"
                             :href="getAmazonLink(currentSong.artist, album.title)" target="_blank"
-                            rel="noopener noreferrer" class="album-item u-hover-zoom"
-                            style="display: flex; gap: 16px; text-decoration: none; align-items: center; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; transition: background 0.2s; border: 1px solid var(--border-color); margin-bottom: 12px;">
-                            <div v-if="album.image" class="album-thumb"
-                                :style="{ backgroundImage: 'url(' + album.image + ')' }"></div>
-                            <div v-else class="album-icon-small"><i data-lucide="disc"></i></div>
-                            <div style="flex: 1; text-align: left;">
-                                <div style="color: var(--text-primary);"><span style="font-weight: 700;">{{ album.title
-                                        }}</span>
-                                    <span
-                                        style="font-size: 0.8rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; margin-left:8px; color: var(--text-secondary);">{{
-                                        album.category }}</span>
-                                </div>
-                                <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">{{
-                                    album.date }}</div>
+                            rel="noopener noreferrer" class="included-album-row">
+                            <div class="included-album-icon" :class="'badge-' + album.category.toLowerCase()">
+                                <i data-lucide="disc-3"></i>
                             </div>
-                            <div
-                                style="color: var(--accent-orange); display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: bold;">
-                                <i data-lucide="shopping-cart" style="width: 18px;"></i>
+                            <div class="included-album-text">
+                                <div class="included-album-title">{{ album.title }}</div>
+                                <div class="included-album-meta">
+                                    <span class="album-cat-badge" :class="'badge-' + album.category.toLowerCase()"
+                                        style="font-size:0.65rem; padding:1px 6px;">{{ album.category }}</span>
+                                    <span style="color:var(--text-secondary); font-size:0.8rem; margin-left:6px;">{{ album.date }}</span>
+                                </div>
+                            </div>
+                            <div style="color: var(--accent-orange); flex-shrink:0;">
+                                <i data-lucide="shopping-cart" style="width:16px; height:16px;"></i>
                             </div>
                         </a>
+                    </div>
+
+                    <!-- ★ Similar Songs section -->
+                    <div v-if="similarSongs.length > 0" class="similar-songs">
+                        <h3 style="margin-bottom: 20px;">似た曲</h3>
+                        <div class="similar-grid">
+                            <div v-for="song in similarSongs" :key="song.id" class="similar-card"
+                                @click="currentSong = song">
+                                <div class="similar-year">{{ song.release_year }}</div>
+                                <div class="similar-title">{{ song.title }}</div>
+                                <div class="similar-artist">{{ song.artist }}</div>
+                                <span v-if="song.mood" class="similar-mood">{{ song.mood }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </transition>
+
+        <!-- ============================= -->
+        <!-- ★ ALBUM DETAIL MODAL          -->
+        <!-- ============================= -->
+        <transition name="fade">
+            <div v-if="currentAlbum" class="modal-overlay" @click.self="currentAlbum = null">
+                <div class="modal-content">
+                    <button class="modal-close" @click="currentAlbum = null"><i data-lucide="x"></i></button>
+
+                    <!-- Album header: icon + info side by side -->
+                    <div class="album-modal-header">
+                        <div class="album-modal-icon" :class="'badge-' + currentAlbum.category.toLowerCase()">
+                            <i data-lucide="disc-3"></i>
+                        </div>
+                        <div class="album-modal-info">
+                            <span class="album-cat-badge" :class="'badge-' + currentAlbum.category.toLowerCase()"
+                                style="margin-bottom:10px; display:inline-block;">
+                                {{ currentAlbum.category }}
+                            </span>
+                            <h2 class="album-modal-title">{{ currentAlbum.title }}</h2>
+                            <div style="color: var(--text-secondary); font-size:0.95rem; margin-top:6px;">
+                                {{ currentAlbum.songs[0] ? currentAlbum.songs[0].artist_group || currentAlbum.songs[0].artist : '' }}
+                            </div>
+                            <div style="color: var(--text-secondary); font-size:0.9rem; margin-top:4px;">{{ currentAlbum.date }}</div>
+                            <a :href="getAmazonLink(currentAlbum.songs[0] ? currentAlbum.songs[0].artist : 'サザンオールスターズ', currentAlbum.title)"
+                                target="_blank" rel="noopener noreferrer" class="amazon-cta-btn"
+                                style="display: inline-flex; margin-top: 16px; font-size:0.9rem; padding: 10px 22px;">
+                                <i data-lucide="shopping-cart"></i> Amazonで購入
+                            </a>
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--border-color);">
+                        <div
+                            style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                            <h3>収録曲 ({{ currentAlbum.songs.length }} Tracks)</h3>
+                            <button class="clear-btn"
+                                @click="filterByAlbum(currentAlbum.title); currentAlbum = null;">
+                                <i data-lucide="filter"></i> 収録曲だけ見る
+                            </button>
+                        </div>
+                        <div class="album-tracklist">
+                            <div v-for="(song, idx) in currentAlbum.songs" :key="song.id"
+                                class="tracklist-item" @click="openSong(song); currentAlbum = null;">
+                                <div class="track-number">{{ idx + 1 }}</div>
+                                <div class="track-info">
+                                    <div class="track-title">{{ song.title }}</div>
+                                    <div class="track-artist">{{ song.artist }}</div>
+                                </div>
+                                <button class="fav-btn" :class="{ active: isFavorite(song.id) }"
+                                    @click.stop="toggleFavorite(song.id)"
+                                    :title="isFavorite(song.id) ? 'お気に入りから削除' : 'お気に入りに追加'">
+                                    <i data-lucide="heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- ============================= -->
+        <!-- ★ KEYBOARD SHORTCUTS MODAL   -->
+        <!-- ============================= -->
+        <transition name="fade">
+            <div v-if="showShortcuts" class="modal-overlay" @click.self="showShortcuts = false">
+                <div class="modal-content" style="max-width: 480px;">
+                    <button class="modal-close" @click="showShortcuts = false"><i data-lucide="x"></i></button>
+                    <h2 style="text-align:center; margin-bottom:32px; font-size:1.4rem;">⌨️ キーボードショートカット</h2>
+                    <div class="shortcut-list">
+                        <div class="shortcut-item">
+                            <div class="shortcut-keys"><kbd>/</kbd></div>
+                            <span>検索ボックスにフォーカス</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <div class="shortcut-keys"><kbd>Esc</kbd></div>
+                            <span>モーダルを閉じる</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <div class="shortcut-keys"><kbd>←</kbd> <kbd>→</kbd></div>
+                            <span>前後の曲へ移動（モーダル表示中）</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <div class="shortcut-keys"><kbd>F</kbd></div>
+                            <span>お気に入りトグル（モーダル表示中）</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <div class="shortcut-keys"><kbd>R</kbd></div>
+                            <span>ランダム選曲</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- ★ Toast notification -->
+        <transition name="toast">
+            <div v-if="toastMsg" class="toast">{{ toastMsg }}</div>
+        </transition>
     </div>
 
     <script>
-        const { createApp, ref, computed, onMounted, watch } = Vue;
+        const { createApp, ref, computed, onMounted, onUnmounted, watch } = Vue;
 
         createApp({
             setup() {
+                // ===== STATE =====
                 const songs = ref([]);
                 const searchQuery = ref('');
                 const selectedThemes = ref([]);
                 const selectedMood = ref('');
                 const selectedAlbumFilter = ref('');
                 const selectedArtist = ref('');
+                const selectedDecade = ref('');
                 const sortBy = ref('year-desc');
                 const displayLimit = ref(48);
                 const currentSong = ref(null);
-
+                const currentAlbum = ref(null);
                 const allThemes = ref([]);
                 const allMoods = ref([]);
                 const allArtists = ref([]);
+                const allDecades = ref([]);
                 const errorMsg = ref('');
                 const viewMode = ref('songs');
                 const albumArtistFilter = ref('');
                 const albumSortBy = ref('date-desc');
+                const favoriteIds = ref([]);
+                const showShortcuts = ref(false);
+                const toastMsg = ref('');
+                const searchInputEl = ref(null);
 
+                // ===== TOAST =====
+                let toastTimer = null;
+                const showToast = (msg) => {
+                    toastMsg.value = msg;
+                    if (toastTimer) clearTimeout(toastTimer);
+                    toastTimer = setTimeout(() => { toastMsg.value = ''; }, 2200);
+                };
+
+                // ===== FAVORITES =====
+                const isFavorite = (id) => favoriteIds.value.includes(id);
+                const toggleFavorite = (id) => {
+                    const idx = favoriteIds.value.indexOf(id);
+                    if (idx > -1) {
+                        favoriteIds.value.splice(idx, 1);
+                        showToast('お気に入りから削除しました');
+                    } else {
+                        favoriteIds.value.push(id);
+                        showToast('♥ お気に入りに追加しました');
+                    }
+                    try { localStorage.setItem('sas-favorites', JSON.stringify(favoriteIds.value)); } catch (e) { }
+                };
+                const favoriteSongs = computed(() =>
+                    songs.value.filter(s => favoriteIds.value.includes(s.id))
+                );
+
+                // ===== URL STATE SYNC =====
+                const syncURL = () => {
+                    const params = new URLSearchParams();
+                    if (searchQuery.value) params.set('q', searchQuery.value);
+                    if (selectedArtist.value) params.set('artist', selectedArtist.value);
+                    if (selectedThemes.value.length) params.set('themes', selectedThemes.value.join(','));
+                    if (selectedMood.value) params.set('mood', selectedMood.value);
+                    if (selectedDecade.value) params.set('decade', selectedDecade.value);
+                    if (sortBy.value !== 'year-desc') params.set('sort', sortBy.value);
+                    if (viewMode.value !== 'songs') params.set('view', viewMode.value);
+                    const str = params.toString();
+                    history.replaceState({}, '', str ? '?' + str : window.location.pathname);
+                };
+
+                const readURL = () => {
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.get('q')) searchQuery.value = params.get('q');
+                    if (params.get('artist')) selectedArtist.value = params.get('artist');
+                    if (params.get('themes')) selectedThemes.value = params.get('themes').split(',').filter(Boolean);
+                    if (params.get('mood')) selectedMood.value = params.get('mood');
+                    if (params.get('decade')) selectedDecade.value = params.get('decade');
+                    if (params.get('sort')) sortBy.value = params.get('sort');
+                    if (params.get('view')) viewMode.value = params.get('view');
+                };
+
+                // ===== KEYBOARD SHORTCUTS =====
+                const handleKeydown = (e) => {
+                    const tag = e.target.tagName.toLowerCase();
+                    const isInput = tag === 'input' || tag === 'textarea';
+
+                    if (e.key === 'Escape') {
+                        if (showShortcuts.value) { showShortcuts.value = false; return; }
+                        if (currentAlbum.value) { currentAlbum.value = null; return; }
+                        if (currentSong.value) { currentSong.value = null; return; }
+                    }
+                    if (!isInput && e.key === '?') {
+                        showShortcuts.value = !showShortcuts.value;
+                        return;
+                    }
+                    if (isInput) return;
+
+                    if (e.key === '/') {
+                        e.preventDefault();
+                        searchInputEl.value?.focus();
+                    }
+                    if (e.key === 'r' || e.key === 'R') {
+                        pickRandomSong();
+                    }
+                    if (currentSong.value) {
+                        if (e.key === 'ArrowRight') navigateSong(1);
+                        if (e.key === 'ArrowLeft') navigateSong(-1);
+                        if (e.key === 'f' || e.key === 'F') toggleFavorite(currentSong.value.id);
+                    }
+                };
+
+                const navigateSong = (direction) => {
+                    const list = filteredSongs.value;
+                    if (list.length === 0) return;
+                    const idx = list.findIndex(s => s.id === currentSong.value.id);
+                    const newIdx = idx === -1 ? 0 : (idx + direction + list.length) % list.length;
+                    currentSong.value = list[newIdx];
+                };
+
+                // ===== MOUNT =====
                 onMounted(async () => {
+                    try {
+                        const saved = localStorage.getItem('sas-favorites');
+                        if (saved) favoriteIds.value = JSON.parse(saved);
+                    } catch (e) { }
+
+                    document.addEventListener('keydown', handleKeydown);
+
                     if (window.location.protocol === 'file:') {
                         errorMsg.value = '【注意】ローカル環境(file://)ではブラウザのセキュリティ制限によりデータファイルを読み込めません。VSCodeのLive Serverなどのローカルサーバー経由でアクセスしてください。';
                     }
+
                     try {
                         const response = await fetch('songs.json');
                         if (!response.ok) throw new Error('Network response was not ok');
                         songs.value = await response.json();
 
-                        // Extract unique artists, exclude empty or Unknown, and apply custom order
                         const baseArtists = [...new Set(songs.value.map(s => s.artist_group))].filter(a => a && a !== 'Unknown');
-                        const artistOrder = [
-                            "サザンオールスターズ",
-                            "桑田佳祐",
-                            "原由子",
-                            "松田弘",    // Assuming 松田浩 meant 松田弘 based on SAS members
-                            "関口和之",
-                            "KUWATA BAND"
-                        ];
-
-                        // Sort artists: ordered items first, then alphabetical, then OTHER at the absolute end
+                        const artistOrder = ["サザンオールスターズ", "桑田佳祐", "原由子", "松田弘", "関口和之", "KUWATA BAND"];
                         baseArtists.sort((a, b) => {
                             if (a === 'OTHER') return 1;
                             if (b === 'OTHER') return -1;
-
                             const indexA = artistOrder.indexOf(a);
                             const indexB = artistOrder.indexOf(b);
-
                             if (indexA !== -1 && indexB !== -1) return indexA - indexB;
                             if (indexA !== -1) return -1;
                             if (indexB !== -1) return 1;
-
                             return a.localeCompare(b, 'ja');
                         });
-
                         allArtists.value = baseArtists;
 
-                        // Extract unique themes dynamically
-                        const themes = [...new Set(songs.value.flatMap(s => s.themes))].sort();
-                        allThemes.value = themes;
+                        allThemes.value = [...new Set(songs.value.flatMap(s => s.themes))].sort();
+                        allMoods.value = [...new Set(songs.value.map(s => s.mood))].filter(Boolean);
 
-                        const moods = [...new Set(songs.value.map(s => s.mood))].filter(Boolean);
-                        allMoods.value = moods;
+                        // Decades
+                        const decadeSet = new Set();
+                        songs.value.forEach(s => {
+                            const y = parseInt(s.release_year);
+                            if (!isNaN(y)) decadeSet.add(Math.floor(y / 10) * 10);
+                        });
+                        allDecades.value = [...decadeSet].sort((a, b) => a - b).map(d => ({
+                            value: String(d),
+                            label: `'${String(d).slice(2)}s`
+                        }));
 
                         lucide.createIcons();
+                        readURL();
 
-                        // Dynamically adjust body padding based on actual header height
                         const adjustPadding = () => {
                             const header = document.querySelector('header');
-                            if (header) {
-                                document.body.style.paddingTop = header.offsetHeight + 'px';
-                            }
+                            if (header) document.body.style.paddingTop = header.offsetHeight + 'px';
                         };
                         adjustPadding();
                         window.addEventListener('resize', adjustPadding);
+
                     } catch (e) {
                         console.error('Failed to load songs:', e);
-                        if (!errorMsg.value) {
-                            errorMsg.value = 'データの読み込みに失敗しました。サーバーが起動しているか確認してください。';
-                        }
+                        if (!errorMsg.value) errorMsg.value = 'データの読み込みに失敗しました。サーバーが起動しているか確認してください。';
                     }
                 });
 
-                watch(currentSong, (newVal) => {
-                    if (newVal) {
-                        setTimeout(() => lucide.createIcons(), 0);
-                    }
+                onUnmounted(() => {
+                    document.removeEventListener('keydown', handleKeydown);
                 });
 
+                // ===== WATCHES =====
+                watch([currentSong, currentAlbum, showShortcuts, viewMode], () => {
+                    setTimeout(() => lucide.createIcons(), 0);
+                });
+
+                let urlSyncTimer = null;
+                watch(
+                    [searchQuery, selectedArtist, selectedThemes, selectedMood, selectedDecade, sortBy, selectedAlbumFilter],
+                    () => {
+                        displayLimit.value = 48;
+                        clearTimeout(urlSyncTimer);
+                        urlSyncTimer = setTimeout(syncURL, 300);
+                    },
+                    { deep: true }
+                );
+                watch(viewMode, () => {
+                    clearTimeout(urlSyncTimer);
+                    urlSyncTimer = setTimeout(syncURL, 300);
+                });
+
+                // ===== COMPUTED: SONGS =====
                 const filteredSongs = computed(() => {
                     let result = songs.value;
 
@@ -392,12 +732,13 @@
                         const q = searchQuery.value.toLowerCase();
                         result = result.filter(s =>
                             s.title.toLowerCase().includes(q) ||
-                            s.artist.toLowerCase().includes(q)
+                            s.artist.toLowerCase().includes(q) ||
+                            s.themes.some(t => t.toLowerCase().includes(q)) ||
+                            (s.mood && s.mood.toLowerCase().includes(q))
                         );
                     }
 
                     if (selectedThemes.value.length > 0) {
-                        // AND filter: matches all of the selected themes
                         result = result.filter(s =>
                             selectedThemes.value.every(t => s.themes.includes(t))
                         );
@@ -415,21 +756,28 @@
                         result = result.filter(s => s.artist_group === selectedArtist.value);
                     }
 
-                    // Sort
+                    if (selectedDecade.value) {
+                        const d = parseInt(selectedDecade.value);
+                        result = result.filter(s => {
+                            const y = parseInt(s.release_year);
+                            return !isNaN(y) && Math.floor(y / 10) * 10 === d;
+                        });
+                    }
+
                     if (sortBy.value === 'year-desc') {
-                        result.sort((a, b) => {
+                        result = [...result].sort((a, b) => {
                             if (a.release_year === 'Unknown') return 1;
                             if (b.release_year === 'Unknown') return -1;
                             return b.release_year.localeCompare(a.release_year);
                         });
                     } else if (sortBy.value === 'year-asc') {
-                        result.sort((a, b) => {
+                        result = [...result].sort((a, b) => {
                             if (a.release_year === 'Unknown') return 1;
                             if (b.release_year === 'Unknown') return -1;
                             return a.release_year.localeCompare(b.release_year);
                         });
                     } else if (sortBy.value === 'title') {
-                        result.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
+                        result = [...result].sort((a, b) => a.title.localeCompare(b.title, 'ja'));
                     }
 
                     return result;
@@ -437,36 +785,25 @@
 
                 const slicedSongs = computed(() => filteredSongs.value.slice(0, displayLimit.value));
 
-                const openSong = (song) => {
-                    currentSong.value = song;
-                };
+                // ★ Similar songs: score by mood + theme overlap
+                const similarSongs = computed(() => {
+                    if (!currentSong.value) return [];
+                    const song = currentSong.value;
+                    return songs.value
+                        .filter(s => s.id !== song.id)
+                        .map(s => {
+                            let score = 0;
+                            if (s.mood && s.mood === song.mood) score += 3;
+                            song.themes.forEach(t => { if (s.themes.includes(t)) score += 1; });
+                            if (s.artist_group === song.artist_group) score += 0.3;
+                            return { ...s, _score: score };
+                        })
+                        .filter(s => s._score >= 2)
+                        .sort((a, b) => b._score - a._score)
+                        .slice(0, 4);
+                });
 
-                const toggleTheme = (theme) => {
-                    const index = selectedThemes.value.indexOf(theme);
-                    if (index > -1) {
-                        selectedThemes.value.splice(index, 1);
-                    } else {
-                        selectedThemes.value.push(theme);
-                    }
-                };
-
-                const pickRandomSong = () => {
-                    if (filteredSongs.value.length === 0) return;
-                    viewMode.value = 'songs'; // switch back to songs view to see the filtered list context
-                    const randomIndex = Math.floor(Math.random() * filteredSongs.value.length);
-                    openSong(filteredSongs.value[randomIndex]);
-                };
-
-                const filterByAlbum = (title) => {
-                    selectedAlbumFilter.value = title;
-                    selectedArtist.value = ''; // Clear artist filter to prevent empty results if album's artist differs
-                    viewMode.value = 'songs';
-                };
-
-                const clearAlbumFilter = () => {
-                    selectedAlbumFilter.value = '';
-                };
-
+                // ===== COMPUTED: ALBUMS =====
                 const sortedAlbums = computed(() => {
                     const albumMap = new Map();
                     songs.value.forEach(s => {
@@ -474,12 +811,9 @@
                             s.albums.forEach(a => {
                                 if (!albumMap.has(a.title)) {
                                     albumMap.set(a.title, {
-                                        title: a.title,
-                                        date: a.date,
-                                        category: a.category,
-                                        image: a.image,
-                                        artistGroup: s.artist_group,
-                                        songs: []
+                                        title: a.title, date: a.date,
+                                        category: a.category, image: a.image,
+                                        artistGroup: s.artist_group, songs: []
                                     });
                                 }
                                 albumMap.get(a.title).songs.push(s);
@@ -491,106 +825,80 @@
 
                 const filteredAlbums = computed(() => {
                     let albums = sortedAlbums.value;
-
-                    // Filter by artist
                     if (albumArtistFilter.value) {
-                        albums = albums.filter(a =>
-                            a.songs.some(s => s.artist_group === albumArtistFilter.value)
-                        );
+                        albums = albums.filter(a => a.songs.some(s => s.artist_group === albumArtistFilter.value));
                     }
-
-                    // Sort
                     if (albumSortBy.value === 'date-desc') {
-                        albums = [...albums].sort((a, b) => {
-                            if (!a.date && !b.date) return 0;
-                            if (!a.date) return 1;
-                            if (!b.date) return -1;
-                            return b.date.localeCompare(a.date);
-                        });
+                        albums = [...albums].sort((a, b) => (!a.date ? 1 : !b.date ? -1 : b.date.localeCompare(a.date)));
                     } else if (albumSortBy.value === 'date-asc') {
-                        albums = [...albums].sort((a, b) => {
-                            if (!a.date && !b.date) return 0;
-                            if (!a.date) return 1;
-                            if (!b.date) return -1;
-                            return a.date.localeCompare(b.date);
-                        });
+                        albums = [...albums].sort((a, b) => (!a.date ? 1 : !b.date ? -1 : a.date.localeCompare(b.date)));
                     } else if (albumSortBy.value === 'title') {
                         albums = [...albums].sort((a, b) => a.title.localeCompare(b.title, 'ja'));
                     }
-
                     return albums;
                 });
 
-                const getAmazonLink = (artist, albumTitle) => {
-                    const searchArtist = artist === 'OTHER' || artist === 'Unknown' ? 'サザンオールスターズ' : artist;
-                    // Changed from music.amazon.co.jp to amazon.co.jp for physical products and overall availability
-                    return `https://www.amazon.co.jp/s?k=${encodeURIComponent(searchArtist + ' ' + albumTitle)}&tag=sasfanjohnny-22`;
+                // ===== ACTIONS =====
+                const openSong = (song) => { currentSong.value = song; };
+                const openAlbum = (album) => { currentAlbum.value = album; };
+
+                const toggleTheme = (theme) => {
+                    const index = selectedThemes.value.indexOf(theme);
+                    if (index > -1) selectedThemes.value.splice(index, 1);
+                    else selectedThemes.value.push(theme);
                 };
 
-                watch(viewMode, () => {
-                    setTimeout(() => lucide.createIcons(), 0);
-                });
+                const pickRandomSong = () => {
+                    const list = (viewMode.value === 'songs' && filteredSongs.value.length > 0)
+                        ? filteredSongs.value : songs.value;
+                    if (list.length === 0) return;
+                    viewMode.value = 'songs';
+                    openSong(list[Math.floor(Math.random() * list.length)]);
+                };
+
+                const filterByAlbum = (title) => {
+                    selectedAlbumFilter.value = title;
+                    selectedArtist.value = '';
+                    viewMode.value = 'songs';
+                };
+
+                const clearAlbumFilter = () => { selectedAlbumFilter.value = ''; };
+
+                // ★ Amazon links with i=music category for better CD conversion
+                const getAmazonLink = (artist, albumTitle) => {
+                    const searchArtist = (artist === 'OTHER' || artist === 'Unknown') ? 'サザンオールスターズ' : artist;
+                    return `https://www.amazon.co.jp/s?k=${encodeURIComponent(searchArtist + ' ' + albumTitle)}&i=music&tag=sasfanjohnny-22`;
+                };
+
+                const getAmazonSongLink = (song) => {
+                    const artist = (song.artist === 'OTHER' || song.artist === 'Unknown') ? 'サザンオールスターズ' : song.artist;
+                    return `https://www.amazon.co.jp/s?k=${encodeURIComponent(artist + ' ' + song.title)}&i=music&tag=sasfanjohnny-22`;
+                };
 
                 return {
-                    songs,
-                    searchQuery,
-                    selectedThemes,
-                    selectedMood,
-                    selectedAlbumFilter,
-                    selectedArtist,
-                    sortBy,
-                    albumSortBy,
-                    albumArtistFilter,
-                    displayLimit,
-                    currentSong,
-                    allThemes,
-                    allMoods,
-                    viewMode,
-                    allArtists,
-                    filteredSongs,
-                    sortedAlbums,
-                    filteredAlbums,
-                    slicedSongs,
-                    openSong,
-                    toggleTheme,
-                    pickRandomSong,
-                    filterByAlbum,
-                    clearAlbumFilter,
-                    getAmazonLink,
-                    errorMsg
+                    songs, searchQuery, selectedThemes, selectedMood, selectedAlbumFilter,
+                    selectedArtist, selectedDecade, sortBy, albumSortBy, albumArtistFilter,
+                    displayLimit, currentSong, currentAlbum, allThemes, allMoods, allDecades,
+                    viewMode, allArtists, filteredSongs, sortedAlbums, filteredAlbums,
+                    slicedSongs, similarSongs, favoriteSongs, favoriteIds,
+                    showShortcuts, toastMsg, searchInputEl,
+                    openSong, openAlbum, toggleTheme, pickRandomSong, filterByAlbum,
+                    clearAlbumFilter, getAmazonLink, getAmazonSongLink, errorMsg,
+                    isFavorite, toggleFavorite, navigateSong
                 };
             }
         }).mount('#app');
     </script>
 
     <style>
-        [v-cloak] {
-            display: none;
-        }
-
-        .fade-enter-active,
-        .fade-leave-active {
-            transition: opacity 0.3s;
-        }
-
-        .fade-enter-from,
-        .fade-leave-to {
-            opacity: 0;
-        }
-
-        /* Modal scrollbar */
-        .modal-content::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .modal-content::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .modal-content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
+        [v-cloak] { display: none; }
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; }
+        .toast-enter-active, .toast-leave-active { transition: all 0.3s ease; }
+        .toast-enter-from, .toast-leave-to { opacity: 0; transform: translateX(-50%) translateY(16px); }
+        .modal-content::-webkit-scrollbar { width: 8px; }
+        .modal-content::-webkit-scrollbar-track { background: transparent; }
+        .modal-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
 </body>
 
